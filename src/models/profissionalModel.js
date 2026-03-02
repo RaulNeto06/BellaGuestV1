@@ -11,12 +11,17 @@ const profissionalModel = {
     return rows[0] || null;
   },
 
-  async create({ nome, especialidade, telefone, status = 'ativo' }) {
+  async create({ nome, especialidade, telefone, status = 'ativo', idUsuario = null }) {
     const [result] = await db.execute(
-      'INSERT INTO Profissional (nome, especialidade, telefone, status) VALUES (?, ?, ?, ?)',
-      [nome, especialidade || null, telefone || null, status]
+      'INSERT INTO Profissional (idUsuario, nome, especialidade, telefone, status) VALUES (?, ?, ?, ?, ?)',
+      [idUsuario, nome, especialidade || null, telefone || null, status]
     );
-    return { id: result.insertId, nome, especialidade, telefone, status };
+    return { id: result.insertId, idUsuario, nome, especialidade, telefone, status };
+  },
+
+  async findByUsuario(idUsuario) {
+    const [rows] = await db.execute('SELECT * FROM Profissional WHERE idUsuario = ?', [idUsuario]);
+    return rows[0] || null;
   },
 
   async update(id, { nome, especialidade, telefone, status }) {

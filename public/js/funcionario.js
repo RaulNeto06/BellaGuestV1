@@ -29,16 +29,18 @@ const funcPage = (() => {
 
   async function loadProfissional() {
     try {
-      const res = await api.getProfissionais();
-      // For demo, associate funcionario with first available professional
-      // In a real system, the professional would be linked to the user account
-      profissional = res.data.find(p => p.status === 'ativo') || res.data[0];
+      // Load the professional linked to the current employee account
+      const res = await api.get('/profissionais/me');
+      profissional = res.data;
       if (profissional) {
         loadHorarios();
         loadServicos();
         loadPerfil();
       }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      // No linked professional found – show a setup prompt
+      console.warn('No professional linked to this account:', e.message);
+    }
   }
 
   async function loadAgendamentos() {

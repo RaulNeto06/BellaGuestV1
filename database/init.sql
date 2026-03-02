@@ -31,10 +31,12 @@ CREATE TABLE IF NOT EXISTS Administrador (
 
 CREATE TABLE IF NOT EXISTS Profissional (
   id INT AUTO_INCREMENT PRIMARY KEY,
+  idUsuario INT NULL UNIQUE COMMENT 'Links to the funcionario user account',
   nome VARCHAR(100) NOT NULL,
   especialidade VARCHAR(100),
   telefone VARCHAR(20),
-  status ENUM('ativo', 'inativo') DEFAULT 'ativo'
+  status ENUM('ativo', 'inativo') DEFAULT 'ativo',
+  FOREIGN KEY (idUsuario) REFERENCES Usuario(id) ON DELETE SET NULL
 );
 
 CREATE TABLE IF NOT EXISTS Servico (
@@ -98,11 +100,11 @@ INSERT INTO Servico (nome, descricao, duracaoMinutos, preco) VALUES
   ('Sobrancelha', 'Design de sobrancelha com linha ou henna', 30, 40.00),
   ('Hidratação', 'Tratamento hidratante profundo para os cabelos', 90, 100.00);
 
--- Professionals
-INSERT INTO Profissional (nome, especialidade, telefone, status) VALUES
-  ('Ana Souza', 'Unhas e Design', '(11) 99999-0001', 'ativo'),
-  ('Beatriz Lima', 'Cabelo e Coloração', '(11) 99999-0002', 'ativo'),
-  ('Carla Mendes', 'Estética e Beleza', '(11) 99999-0003', 'ativo');
+-- Professionals (idUsuario is NULL for seed data; link to a funcionario user account to enable employee login)
+INSERT INTO Profissional (idUsuario, nome, especialidade, telefone, status) VALUES
+  (NULL, 'Ana Souza', 'Unhas e Design', '(11) 99999-0001', 'ativo'),
+  (NULL, 'Beatriz Lima', 'Cabelo e Coloração', '(11) 99999-0002', 'ativo'),
+  (NULL, 'Carla Mendes', 'Estética e Beleza', '(11) 99999-0003', 'ativo');
 
 -- Professional-Service relationships
 -- Ana: Manicure, Pedicure, Sobrancelha

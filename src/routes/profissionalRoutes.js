@@ -3,6 +3,8 @@ const profissionalController = require('../controllers/profissionalController');
 const { authenticate, authorize } = require('../middlewares/authMiddleware');
 
 router.get('/', profissionalController.getAll);
+// /me must be defined before /:id to avoid Express interpreting 'me' as a numeric id
+router.get('/me', authenticate, authorize('funcionario', 'administrador'), profissionalController.getMe);
 router.get('/:id', profissionalController.getById);
 router.post('/', authenticate, authorize('administrador'), profissionalController.create);
 router.put('/:id', authenticate, authorize('administrador'), profissionalController.update);

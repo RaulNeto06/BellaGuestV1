@@ -1,10 +1,21 @@
 const profissionalService = require('../services/profissionalService');
+const profissionalModel = require('../models/profissionalModel');
+const AppError = require('../utils/AppError');
 
 const profissionalController = {
   async getAll(req, res, next) {
     try {
       const profissionais = await profissionalService.getAll();
       res.json({ success: true, data: profissionais });
+    } catch (err) { next(err); }
+  },
+
+  // Returns the professional record linked to the currently logged-in employee
+  async getMe(req, res, next) {
+    try {
+      const prof = await profissionalModel.findByUsuario(req.user.id);
+      if (!prof) throw new AppError('Nenhum profissional vinculado a este usuário', 404);
+      res.json({ success: true, data: prof });
     } catch (err) { next(err); }
   },
 

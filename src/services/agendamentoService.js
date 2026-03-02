@@ -2,6 +2,8 @@ const agendamentoModel = require('../models/agendamentoModel');
 const profissionalModel = require('../models/profissionalModel');
 const profissionalServicoModel = require('../models/profissionalServicoModel');
 const profissionalHorarioModel = require('../models/profissionalHorarioModel');
+const db = require('../config/database');
+const AppError = require('../utils/AppError');
 
 function generateTimeSlots(startTime, endTime, intervalMinutes = 60) {
   const slots = [];
@@ -42,7 +44,6 @@ const agendamentoService = {
 
       let servicosDuration = 60;
       if (idServico) {
-        const db = require('../config/database');
         const [[serv]] = await db.execute('SELECT duracaoMinutos FROM Servico WHERE id = ?', [idServico]);
         if (serv) servicosDuration = serv.duracaoMinutos;
       }
@@ -72,7 +73,7 @@ const agendamentoService = {
 
   async create({ data, horario, idCliente, idServico, idProfissional, observacoes }) {
     if (!data || !horario || !idCliente || !idServico) {
-      throw new Error('Campos obrigatórios: data, horario, idCliente, idServico');
+      throw new AppError('Campos obrigatórios: data, horario, idCliente, idServico');
     }
 
     // Auto-assign professional if not provided
@@ -86,10 +87,10 @@ const agendamentoService = {
           break;
         }
       }
-      if (!profId) throw new Error('Nenhum profissional disponível neste horário');
+      if (!profId) throw new AppError('Nenhum profissional disponível neste horário');
     } else {
       const conflict = await agendamentoModel.checkConflict(data, horario, profId);
-      if (conflict) throw new Error('Horário já reservado para este profissional');
+      if (conflict) throw new AppError('Horário já reservado para este profissional');
     }
 
     return agendamentoModel.create({ data, horario, idCliente, idServico, idProfissional: profId, observacoes });
@@ -97,18 +98,18 @@ const agendamentoService = {
 
   async cancel(id, userId, tipoUsuario) {
     const agendamento = await agendamentoModel.findById(id);
-    if (!agendamento) throw new Error('Agendamento não encontrado');
+    if (!agendamento) throw new AppError('Agendamento não encontrado', 404);
 
     if (tipoUsuario === 'cliente') {
       const clienteModel = require('../models/clienteModel');
       const cliente = await clienteModel.findByUserId(userId);
       if (!cliente || agendamento.idCliente !== cliente.id) {
-        throw new Error('Sem permissão para cancelar este agendamento');
+        throw new AppError('Sem permissão para cancelar este agendamento', 403);
       }
     }
 
     if (['concluido', 'cancelado'].includes(agendamento.status)) {
-      throw new Error('Agendamento não pode ser cancelado neste estado');
+      throw new AppError('Agendamento não pode ser cancelado neste estado');
     }
 
     return agendamentoModel.update(id, { status: 'cancelado' });
@@ -116,14 +117,14 @@ const agendamentoService = {
 
   async complete(id) {
     const agendamento = await agendamentoModel.findById(id);
-    if (!agendamento) throw new Error('Agendamento não encontrado');
-    if (agendamento.status === 'cancelado') throw new Error('Agendamento cancelado');
+    if (!agendamento) throw new AppError('Agendamento não encontrado', 404);
+    if (agendamento.status === 'cancelado') throw new AppError('Agendamento cancelado');
     return agendamentoModel.update(id, { status: 'concluido' });
   },
 
   async updateStatus(id, status, observacoes) {
     const valid = ['pendente', 'confirmado', 'concluido', 'cancelado'];
-    if (!valid.includes(status)) throw new Error('Status inválido');
+    if (!valid.includes(status)) throw new AppError('Status inválido');
     return agendamentoModel.update(id, { status, observacoes });
   },
 

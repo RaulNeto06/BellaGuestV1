@@ -1,3 +1,4 @@
+const db = require('../config/database');
 const profissionalModel = require('../models/profissionalModel');
 const profissionalServicoModel = require('../models/profissionalServicoModel');
 const profissionalHorarioModel = require('../models/profissionalHorarioModel');
@@ -63,8 +64,6 @@ const profissionalService = {
   },
 
   async replaceHorarios(idProfissional, horarios) {
-    // Delete all and re-insert for a given professional
-    const db = require('../config/database');
     await db.execute('DELETE FROM ProfissionalHorario WHERE idProfissional = ?', [idProfissional]);
     const created = [];
     for (const h of horarios) {

@@ -1,4 +1,6 @@
 /* ─── Funcionário Page Logic ─────────────────────────────────────────────── */
+function escapeBacktick(str) { return (str || '').replace(/`/g, "'"); }
+
 const funcPage = (() => {
   let auth, profissional = null, allServicos = [];
   let currentDate = todayStr();
@@ -72,7 +74,7 @@ const funcPage = (() => {
             ${a.status !== 'concluido' && a.status !== 'cancelado'
               ? `<button class="btn btn-success btn-sm" onclick="funcPage.marcarConcluido(${a.id})">✔</button>` : ''}
             ${a.status !== 'cancelado'
-              ? `<button class="btn btn-ghost btn-sm" onclick="funcPage.openObs(${a.id}, \`${(a.observacoes||'').replace(/`/g,"'")}\`)">📝</button>` : ''}
+              ? `<button class="btn btn-ghost btn-sm" onclick="funcPage.openObs(${a.id}, \`${escapeBacktick(a.observacoes)}\`)">📝</button>` : ''}
             ${['pendente','confirmado'].includes(a.status)
               ? `<button class="btn btn-danger btn-sm" onclick="funcPage.cancelar(${a.id})">✕</button>` : ''}
           </div>

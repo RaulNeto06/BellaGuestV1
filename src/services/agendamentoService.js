@@ -81,7 +81,10 @@ const agendamentoService = {
       const available = await profissionalServicoModel.findByServico(idServico);
       for (const prof of available) {
         const conflict = await agendamentoModel.checkConflict(data, horario, prof.id);
-        if (!conflict) { profId = prof.id; break; }
+        if (!conflict) {
+          profId = prof.id;
+          break;
+        }
       }
       if (!profId) throw new Error('Nenhum profissional disponível neste horário');
     } else {

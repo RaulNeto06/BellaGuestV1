@@ -6,7 +6,7 @@ function errorMiddleware(err, req, res, next) { // eslint-disable-line no-unused
   }
 
   if (err.message.includes('já cadastrado') || err.message.includes('não encontrado') ||
-      err.message.includes('inválid') || err.message.includes('obrigatório') ||
+      err.message.includes('inválido') || err.message.includes('obrigatório') ||
       err.message.includes('disponível') || err.message.includes('permissão') ||
       err.message.includes('reservado') || err.message.includes('estado') ||
       err.message.includes('cancelado') || err.message.includes('Status')) {

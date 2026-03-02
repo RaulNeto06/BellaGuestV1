@@ -1,4 +1,6 @@
 /* ─── Admin Page Logic ───────────────────────────────────────────────────── */
+function escapeBacktick(str) { return (str || '').replace(/`/g, "'"); }
+
 const adminPage = (() => {
   let auth, agendamentos = [], profissionais = [], servicos = [];
 
@@ -97,7 +99,7 @@ const adminPage = (() => {
         <td>${a.nomeProfissional}</td>
         <td>${statusBadge(a.status)}</td>
         <td>
-          <button class="btn btn-ghost btn-sm" onclick="adminPage.openAgStatus(${a.id}, '${a.status}', \`${(a.observacoes||'').replace(/`/g,"'")}\`)">✏️</button>
+          <button class="btn btn-ghost btn-sm" onclick="adminPage.openAgStatus(${a.id}, '${a.status}', \`${escapeBacktick(a.observacoes)}\`)">✏️</button>
           ${['pendente','confirmado'].includes(a.status)
             ? `<button class="btn btn-danger btn-sm" onclick="adminPage.cancelarAg(${a.id})">✕</button>` : ''}
         </td>

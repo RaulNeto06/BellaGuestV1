@@ -1,0 +1,77 @@
+============================================================
+  COMO EXECUTAR O SITE BelaGuest
+============================================================
+
+------------------------------------------------------------
+OPÇÃO 1 — COM DOCKER (RECOMENDADO)
+------------------------------------------------------------
+Pré-requisito: ter Docker instalado.
+Download: https://www.docker.com/products/docker-desktop
+
+Passo a passo:
+
+  1. Abra o terminal e entre na pasta do projeto:
+       cd belaguest
+
+  2. Copie o arquivo de variáveis de ambiente:
+       cp .env.example .env
+
+  3. Suba os containers (API + banco MySQL):
+       docker compose up --build
+
+  4. Acesse no navegador:
+       http://localhost:3000
+
+Para parar o servidor:
+       docker compose down
+
+------------------------------------------------------------
+OPÇÃO 2 — LOCAL (SEM DOCKER)
+------------------------------------------------------------
+Pré-requisitos:
+  - Node.js 20+ instalado  (https://nodejs.org)
+  - MySQL 8 instalado e rodando localmente
+
+Passo a passo:
+
+  1. Abra o terminal e entre na pasta do projeto:
+       cd belaguest
+
+  2. Copie e edite o arquivo de variáveis de ambiente:
+       cp .env.example .env
+     Edite o .env e ajuste DB_HOST, DB_USER, DB_PASSWORD e DB_NAME
+     para os dados do seu MySQL local.
+
+  3. Crie o banco de dados (execute no MySQL):
+       SOURCE database/init.sql;
+
+  4. Instale as dependências Node.js:
+       npm install
+
+  5. Inicie o servidor em modo desenvolvimento:
+       npm run dev
+
+     Ou em modo produção:
+       npm start
+
+  6. Acesse no navegador:
+       http://localhost:3000
+
+------------------------------------------------------------
+USUÁRIO ADMINISTRADOR PADRÃO
+------------------------------------------------------------
+  E-mail : admin@belaguest.com
+  Senha  : admin123
+
+  ⚠ ATENÇÃO: Troque essa senha imediatamente após o primeiro
+  acesso. Nunca use credenciais padrão em ambiente de produção.
+
+------------------------------------------------------------
+RESUMO RÁPIDO (Docker)
+------------------------------------------------------------
+  cd belaguest
+  cp .env.example .env
+  docker compose up --build
+  # Acesse: http://localhost:3000
+
+============================================================

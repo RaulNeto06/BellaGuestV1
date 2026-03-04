@@ -1,8 +1,8 @@
 const express = require('express');
 const agendamentoController = require('../controllers/agendamentoController');
-const authMiddleware = require('../middlewares/authMiddleware');
-const roleMiddleware = require('../middlewares/roleMiddleware');
-const validateRequest = require('../middlewares/validateRequest');
+const authMiddleware = require('../../middlewares/authMiddleware');
+const roleMiddleware = require('../../middlewares/roleMiddleware');
+const validateRequest = require('../../middlewares/validateRequest');
 const {
   agendamentoCreateValidator,
   agendamentoUpdateValidator,
@@ -10,7 +10,7 @@ const {
   observacaoValidator,
   sugestoesValidator,
   disponibilidadeValidator
-} = require('./validators');
+} = require('../validators/validators');
 
 const router = express.Router();
 

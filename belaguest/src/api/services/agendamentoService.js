@@ -3,7 +3,7 @@ const clienteModel = require('../models/clienteModel');
 const profissionalModel = require('../models/profissionalModel');
 const servicoModel = require('../models/servicoModel');
 const HttpError = require('./httpError');
-const { getIO } = require('../config/socket');
+const { getIO } = require('../../config/socket');
 
 function timeToMinutes(value) {
   const [hour, minute] = String(value).split(':').map(Number);

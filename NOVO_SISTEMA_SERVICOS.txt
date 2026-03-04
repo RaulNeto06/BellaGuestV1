@@ -1,0 +1,281 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║         BELAGUEST - NOVO SISTEMA DE SERVIÇOS E ESPECIALIDADES                ║
+║                                                                              ║
+║     Os serviços agora se substituem pela coluna "especialidade"             ║
+║     Cada profissional pode oferecer múltiplos serviços                      ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════════════════
+
+🎯 COMO FUNCIONA O NOVO SISTEMA
+═══════════════════════════════════════════════════════════════════════════
+
+ANTES:
+  - Profissional tinha um campo "especialidade" (texto fixo)
+  - Ex: "Manicure e Pedicure"
+
+AGORA:
+  - Profissional pode ter 1 ou MÚLTIPLOS serviços vinculados
+  - Cada serviço tem: nome, descrição, duração e preço
+  - Sistema flexível e escalável
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+👤 FLUXO PARA O PROFISSIONAL (FUNCIONÁRIO)
+═══════════════════════════════════════════════════════════════════════════
+
+1️⃣  FAZER LOGIN
+   Email: funcionaria@belaguest.com
+   Senha: 123456
+
+2️⃣  VER MEUS SERVIÇOS
+   GET /api/v1/profissionais/me/servicos
+   
+   Resposta:
+   [
+     {
+       "id": 1,
+       "nome": "Manicure",
+       "descricao": "Manicure completo",
+       "duracaoMinutos": 30,
+       "preco": "50.00"
+     },
+     {
+       "id": 2,
+       "nome": "Pedicure",
+       "descricao": "Pedicure completo",
+       "duracaoMinutos": 40,
+       "preco": "60.00"
+     },
+     {
+       "id": 3,
+       "nome": "Cabelo",
+       "descricao": "Corte e penteado",
+       "duracaoMinutos": 60,
+       "preco": "80.00"
+     }
+   ]
+
+3️⃣  ATUALIZAR MEUS SERVIÇOS
+   Se quiser agregar ou remover serviços que você oferece:
+   
+   PATCH /api/v1/profissionais/me/servicos
+   Content-Type: application/json
+   Authorization: Bearer <seu_token_jwt>
+   
+   Body:
+   {
+     "idsServicos": [1, 2, 3]
+   }
+   
+   Isso vincula os serviços com IDs 1, 2 e 3 ao profissional
+   
+   Exemplos:
+   - Vincular apenas Manicure:     { "idsServicos": [1] }
+   - Vincular Manicure + Pedicure: { "idsServicos": [1, 2] }
+   - Vincular todos:               { "idsServicos": [1, 2, 3] }
+
+4️⃣  GERENCIAR DISPONIBILIDADE
+   Continua igual, para indicar em qual horário você atende
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+👥 FLUXO PARA O CLIENTE
+═══════════════════════════════════════════════════════════════════════════
+
+1️⃣  FAZER LOGIN
+   Email: cliente@belaguest.com
+   Senha: 123456
+
+2️⃣  VER SERVIÇOS DISPONÍVEIS
+   GET /api/v1/servicos
+   
+   Resposta: Lista de todos os serviços do salão
+
+3️⃣  VER PROFISSIONAIS DISPONÍVEIS
+   GET /api/v1/profissionais
+   
+   Resposta: Lista de profissionais
+   
+   Obs: Para ver quais serviços cada profissional oferece,
+        o cliente precisa:
+        a) Ver detalhes de um profissional:
+           GET /api/v1/profissionais/:id
+
+4️⃣  AGENDAR COM PROFISSIONAL E SERVIÇO
+   POST /api/v1/agendamentos
+   
+   Body:
+   {
+     "data": "2026-03-15",
+     "horario": "10:30",
+     "idServico": 1,          ← ID do serviço
+     "idProfissional": 1      ← ID do profissional que oferece esse serviço
+   }
+   
+   ⚠️  IMPORTANTE: Ele escolhe:
+       - Um SERVIÇO (de todos disponíveis)
+       - Um PROFISSIONAL (que oferta esse serviço)
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+🛠️  FLUXO PARA O ADMINISTRADOR
+═══════════════════════════════════════════════════════════════════════════
+
+1️⃣  FAZER LOGIN
+   Email: admin@belaguest.com
+   Senha: 123456
+
+2️⃣  CRIAR NOVO SERVIÇO
+   POST /api/v1/servicos
+   
+   Body:
+   {
+     "nome": "Alongamento de Unhas",
+     "descricao": "Alongamento com gel UV",
+     "duracaoMinutos": 45,
+     "preco": 70.00
+   }
+
+3️⃣  CRIAR NOVO PROFISSIONAL
+   POST /api/v1/profissionais
+   
+   Body:
+   {
+     "nome": "João Silva",
+     "telefone": "11987654321",
+     "idsServicos": [1, 2],        ← IDs dos serviços que ele oferece
+     "disponibilidades": [         ← Quando ele está disponível
+       {
+         "diaSemana": 0,           ← Domingo = 0, Seg = 1, ... Sab = 6
+         "horarioInicio": "09:00",
+         "horarioFim": "18:00"
+       }
+     ]
+   }
+
+4️⃣  VINCULAR PROFISSIONAL COM USUÁRIO DO TIPO FUNCIONÁRIO
+   
+   Primeiro crie um usuário FUNCIONÁRIO via /api/v1/auth/register
+   Depois vincule ao profissional via:
+   
+   PUT /api/v1/profissionais/:id
+   
+   Body:
+   {
+     "idUsuario": 10,              ← ID do usuário FUNCIONÁRIO
+     "nome": "João Silva",
+     "telefone": "11987654321",
+     "status": "ATIVO"
+   }
+
+5️⃣  ATUALIZAR SERVIÇOS DE UM PROFISSIONAL
+   PUT /api/v1/profissionais/:id
+   
+   Body:
+   {
+     "nome": "João Silva",
+     "telefone": "11987654321",
+     "idsServicos": [1, 3, 4],     ← Se atualizar, substitui todos
+     "status": "ATIVO"
+   }
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+📊 ESTRUTURA NO BANCO DE DADOS
+═══════════════════════════════════════════════════════════════════════════
+
+Tabela: Servico
+┌──────────────────────────────────────────────┐
+│ id   │ 1                                      │
+│ nome │ Manicure                               │
+│ descricao │ Manicure completo                │
+│ duracaoMinutos │ 30                          │
+│ preco │ 50.00                                │
+└──────────────────────────────────────────────┘
+
+Tabela: Profissional (SEM especialidade agora!)
+┌──────────────────────────────────────┐
+│ id   │ 1                              │
+│ idUsuario │ 2                         │
+│ nome │ Maria Silva                    │
+│ telefone │ 11999999999               │
+│ intervaloMinutos │ 60                 │
+│ status │ ATIVO                        │
+└──────────────────────────────────────┘
+
+Tabela: ProfissionalServico (novo relacionamento!)
+┌──────────────────────────────┐
+│ id   │ 1                      │
+│ idProfissional │ 1           │
+│ idServico │ 1                │
+└──────────────────────────────┘
+
+Tabela: Agendamento
+┌────────────────────────────────────────────┐
+│ id   │ 1                                    │
+│ data │ 2026-03-15                          │
+│ horario │ 10:30                            │
+│ idCliente │ 1                              │
+│ idServico │ 1       ← Qual serviço        │
+│ idProfissional │ 1  ← Qual profissional   │
+│ status │ PENDENTE                         │
+└────────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+✅ VALIDAÇÕES AUTOMÁTICAS
+═══════════════════════════════════════════════════════════════════════════
+
+⚠️  Ao criar agendamento, o sistema valida automaticamente:
+
+  1. O profissional oferece o serviço solicitado?
+  2. O profissional está disponível naquele dia/horário?
+  3. O profissional já tem outro agendamento naquele horário?
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+📌 RESUMO DAS MUDANÇAS
+═══════════════════════════════════════════════════════════════════════════
+
+❌ REMOVIDO:
+   - Campo "especialidade" em Profissional
+
+✅ ADICIONADO:
+   - Novo endpoint: GET /api/v1/profissionais/me/servicos
+   - Novo endpoint: PATCH /api/v1/profissionais/me/servicos
+   - Melhor flexibilidade: profissional pode oferecer múltiplos serviços
+   - Cada serviço tem preço e duração independentes
+
+═══════════════════════════════════════════════════════════════════════════
+
+🧪 TESTE RÁPIDO
+═══════════════════════════════════════════════════════════════════════════
+
+# 1. Login funcionária
+TOKEN=$(curl -s -X POST http://localhost:3000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"funcionaria@belaguest.com","senha":"123456"}' | jq -r '.token')
+
+# 2. Ver serviços dela
+curl -X GET http://localhost:3000/api/v1/profissionais/me/servicos \
+  -H "Authorization: Bearer $TOKEN" | jq '.'
+
+# 3. Atualizar para incluir novo serviço
+curl -X PATCH http://localhost:3000/api/v1/profissionais/me/servicos \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"idsServicos":[1,2,3]}'
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+Criado em: 2026-03-04
+Desenvolvedor: RaulNeto06
+Versão: 2.0.0 (Novo sistema de serviços)

@@ -1,4 +1,4 @@
-const { pool } = require('../config/database');
+const { pool } = require('../../config/database');
 
 async function createAgendamento({ data, horario, status, idCliente, idServico, idProfissional }) {
   const [result] = await pool.execute(

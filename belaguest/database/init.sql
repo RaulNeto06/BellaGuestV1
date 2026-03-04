@@ -24,7 +24,6 @@ CREATE TABLE IF NOT EXISTS Profissional (
   id INT AUTO_INCREMENT PRIMARY KEY,
   idUsuario INT UNIQUE,
   nome VARCHAR(120) NOT NULL,
-  especialidade VARCHAR(120) NOT NULL,
   telefone VARCHAR(20) NOT NULL,
   intervaloMinutos INT NOT NULL DEFAULT 60,
   status ENUM('ATIVO', 'INATIVO') NOT NULL DEFAULT 'ATIVO',
@@ -112,3 +111,11 @@ SELECT u.id
 FROM Usuario u
 WHERE u.email = 'admin@belaguest.com'
   AND NOT EXISTS (SELECT 1 FROM Administrador a WHERE a.idUsuario = u.id);
+
+-- Serviços padrão
+INSERT INTO Servico (nome, descricao, duracaoMinutos, preco)
+VALUES
+  ('Manicure', 'Manicure completo', 30, 50.00),
+  ('Pedicure', 'Pedicure completo', 40, 60.00),
+  ('Cabelo', 'Corte e penteado', 60, 80.00)
+ON DUPLICATE KEY UPDATE id=id;

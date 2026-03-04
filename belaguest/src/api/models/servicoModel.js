@@ -1,4 +1,4 @@
-const { pool } = require('../config/database');
+const { pool } = require('../../config/database');
 
 async function createServico({ nome, descricao, duracaoMinutos, preco }) {
   const [result] = await pool.execute(

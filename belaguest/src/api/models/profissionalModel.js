@@ -1,12 +1,12 @@
-const { pool } = require('../config/database');
+const { pool } = require('../../config/database');
 
-async function createProfissional({ idUsuario = null, nome, especialidade, telefone, intervaloMinutos = 60, status = 'ATIVO' }) {
+async function createProfissional({ idUsuario = null, nome, telefone, intervaloMinutos = 60, status = 'ATIVO' }) {
   const [result] = await pool.execute(
-    'INSERT INTO Profissional (idUsuario, nome, especialidade, telefone, intervaloMinutos, status) VALUES (?, ?, ?, ?, ?, ?)',
-    [idUsuario, nome, especialidade, telefone, intervaloMinutos, status]
+    'INSERT INTO Profissional (idUsuario, nome, telefone, intervaloMinutos, status) VALUES (?, ?, ?, ?, ?)',
+    [idUsuario, nome, telefone, intervaloMinutos, status]
   );
 
-  return { id: result.insertId, idUsuario, nome, especialidade, telefone, intervaloMinutos, status };
+  return { id: result.insertId, idUsuario, nome, telefone, intervaloMinutos, status };
 }
 
 async function listProfissionais() {
@@ -24,10 +24,10 @@ async function findProfissionalByUserId(idUsuario) {
   return rows[0] || null;
 }
 
-async function updateProfissional(id, { idUsuario = null, nome, especialidade, telefone, intervaloMinutos = 60, status }) {
+async function updateProfissional(id, { idUsuario = null, nome, telefone, intervaloMinutos = 60, status }) {
   await pool.execute(
-    'UPDATE Profissional SET idUsuario = ?, nome = ?, especialidade = ?, telefone = ?, intervaloMinutos = ?, status = ? WHERE id = ?',
-    [idUsuario, nome, especialidade, telefone, intervaloMinutos, status, id]
+    'UPDATE Profissional SET idUsuario = ?, nome = ?, telefone = ?, intervaloMinutos = ?, status = ? WHERE id = ?',
+    [idUsuario, nome, telefone, intervaloMinutos, status, id]
   );
 
   return findProfissionalById(id);

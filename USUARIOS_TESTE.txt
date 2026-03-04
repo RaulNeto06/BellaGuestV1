@@ -1,0 +1,326 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║              BELAGUEST - USUÁRIOS DE TESTE E CREDENCIAIS                     ║
+║                                                                              ║
+║              Esses usuários estão pré-configurados no banco de dados        ║
+║                   para facilitar testes da aplicação                        ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════════════════
+
+📌 USUÁRIOS DISPONÍVEIS
+
+═══════════════════════════════════════════════════════════════════════════
+
+1️⃣  ADMINISTRADOR
+────────────────────────────────────────────────────────────────────────
+
+   Email:      admin@belaguest.com
+   Senha:      123456
+   Tipo:       ADMINISTRADOR
+   
+   ✓ Acesso total à aplicação
+   ✓ Pode gerenciar serviços
+   ✓ Pode gerenciar profissionais
+   ✓ Pode gerenciar usuários
+   ✓ Pode visualizar dashboard de todos os usuários
+
+
+2️⃣  PROFISSIONAL / FUNCIONÁRIO
+────────────────────────────────────────────────────────────────────────
+
+   Email:      funcionaria@belaguest.com
+   Senha:      123456
+   Nome:       Maria Silva
+   Tipo:       FUNCIONARIO
+   Telefone:   11999999999
+   Serviços:   Manicure, Pedicure
+   
+   ✓ Pode gerenciar seus serviços ofertados
+   ✓ Pode gerenciar sua disponibilidade
+   ✓ Pode visualizar seus agendamentos
+   ✓ Pode visualizar dashboard com seus dados
+   ✓ Pode atualizar seus dados pessoais
+
+
+3️⃣  CLIENTE
+────────────────────────────────────────────────────────────────────────
+
+   Email:      cliente@belaguest.com
+   Senha:      123456
+   Nome:       João Cliente
+   Tipo:       CLIENTE
+   Telefone:   11988888888
+   
+   ✓ Pode agendar serviços
+   ✓ Pode visualizar seus próprios agendamentos
+   ✓ Pode atualizar seus dados pessoais
+   ✓ Pode cancelar agendamentos
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+🔐 COMO FAZER LOGIN NA API
+═══════════════════════════════════════════════════════════════════════════
+
+Via cURL:
+────────────────────────────────────────────────────────────────────────
+
+# Para o ADMINISTRADOR
+curl -X POST http://localhost:3000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "admin@belaguest.com",
+    "senha": "123456"
+  }'
+
+# Para o PROFISSIONAL
+curl -X POST http://localhost:3000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "funcionaria@belaguest.com",
+    "senha": "123456"
+  }'
+
+# Para o CLIENTE
+curl -X POST http://localhost:3000/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "cliente@belaguest.com",
+    "senha": "123456"
+  }'
+
+Resposta esperada:
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "usuario": {
+    "id": 1,
+    "nome": "Admin BelaGuest",
+    "email": "admin@belaguest.com",
+    "tipoUsuario": "ADMINISTRADOR"
+  }
+}
+
+
+Usando o Token (JWT)
+────────────────────────────────────────────────────────────────────────
+
+Copie o token retornado e use em futuras requisições:
+
+curl -X GET http://localhost:3000/api/v1/auth/me \
+  -H "Authorization: Bearer <seu_token_jwt_aqui>"
+
+Substitua <seu_token_jwt_aqui> pelo token obtido no login.
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+💻 VIA INTERFACE GRÁFICA (POSTMAN/INSOMNIA)
+═══════════════════════════════════════════════════════════════════════════
+
+1. Abra o Postman ou Insomnia
+2. Create nova requisição
+3. Method: POST
+4. URL: http://localhost:3000/api/v1/auth/login
+5. Headers:
+   Key: Content-Type
+   Value: application/json
+6. Body (raw JSON):
+   {
+     "email": "admin@belaguest.com",
+     "senha": "123456"
+   }
+7. Execute a requisição
+8. O token JWT será retornado na resposta
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+🧪 EXEMPLOS DE REQUISIÇÕES POR PERFIL
+═══════════════════════════════════════════════════════════════════════════
+
+COMO ADMINISTRADOR
+────────────────────────────────────────────────────────────────────────
+
+1. Listar todos os serviços:
+   GET /api/v1/servicos
+   
+2. Criar novo serviço:
+   POST /api/v1/servicos
+   Body: {
+     "nome": "Cabelo",
+     "descricao": "Corte e penteado",
+     "duracaoMinutos": 60,
+     "preco": 80.00
+   }
+
+3. Listar todos os profissionais:
+   GET /api/v1/profissionais
+
+4. Listar todos os agendamentos:
+   GET /api/v1/agendamentos
+
+5. Visualizar dashboard:
+   GET /api/v1/dashboard/resumo
+
+
+COMO PROFISSIONAL
+────────────────────────────────────────────────────────────────────────
+
+1. Obter meus dados:
+   GET /api/v1/profissionais/me
+   
+2. Listar meus serviços:
+   GET /api/v1/profissionais/me/servicos
+   
+3. Atualizar meus serviços ofertados:
+   PATCH /api/v1/profissionais/me/servicos
+   Body: {
+     "idsServicos": [1, 2, 3]
+   }
+   
+4. Listar meus agendamentos:
+   GET /api/v1/agendamentos
+   
+5. Visualizar minha disponibilidade:
+   GET /api/v1/profissionais/me
+   (Ver campo "disponibilidades")
+   
+6. Atualizar disponibilidade:
+   PATCH /api/v1/profissionais/me/disponibilidade
+   Body: {
+     "disponibilidade": [
+       {
+         "diaSemana": 0,
+         "horarioInicio": "09:00",
+         "horarioFim": "18:00"
+       }
+     ],
+     "intervaloMinutos": 30
+   }
+
+7. Visualizar dashboard pessoal:
+   GET /api/v1/dashboard/resumo
+
+
+COMO CLIENTE
+────────────────────────────────────────────────────────────────────────
+
+1. Obter meus dados:
+   GET /api/v1/auth/me
+   
+2. Listar serviços disponíveis:
+   GET /api/v1/servicos
+   
+3. Listar profissionais:
+   GET /api/v1/profissionais
+   
+4. Criar novo agendamento:
+   POST /api/v1/agendamentos
+   Body: {
+     "data": "2026-03-15",
+     "horario": "10:00",
+     "idServico": 1,
+     "idProfissional": 1
+   }
+
+5. Listar meus agendamentos:
+   GET /api/v1/agendamentos
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+📊 ESTRUTURA DE DADOS DOS USUÁRIOS NO BANCO
+═══════════════════════════════════════════════════════════════════════════
+
+Tabela: Usuario
+┌─────────────────────────────────────────┐
+│ id     │ 1                                │
+│ nome   │ Admin BelaGuest                 │
+│ email  │ admin@belaguest.com             │
+│ senha  │ (hash bcrypt)                   │
+│ tipo   │ ADMINISTRADOR                   │
+└─────────────────────────────────────────┘
+
+Tabela: Administrador
+┌─────────────────────────────────────────┐
+│ id     │ 1                                │
+│ idUsuario │ 1                            │
+└─────────────────────────────────────────┘
+
+Tabela: Profissional
+┌──────────────────────────────────────────────┐
+│ id     │ 1                                    │
+│ idUsuario │ 2                                │
+│ nome   │ Maria Silva                        │
+│ especialidade │ Manicure e Pedicure        │
+│ telefone │ 11999999999                      │
+│ status │ ATIVO                              │
+└──────────────────────────────────────────────┘
+
+Tabela: Cliente
+┌──────────────────────────────────────────┐
+│ id     │ 1                                │
+│ idUsuario │ 3                            │
+│ telefone │ 11988888888                   │
+└──────────────────────────────────────────┘
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+🔄 FLUXO DE USO RECOMENDADO PARA TESTES
+═══════════════════════════════════════════════════════════════════════════
+
+1. LOGIN COM ADMINISTRADOR
+   └─ Criar serviços
+   └─ Criar profissionais
+
+2. LOGIN COM PROFISSIONAL
+   └─ Configurar disponibilidade
+   └─ Verificar agendamentos
+
+3. LOGIN COM CLIENTE
+   └─ Visualizar serviços
+   └─ Visualizar profissionais
+   └─ Agendar serviço
+
+4. VOLTA COM ADMINISTRADOR
+   └─ Visualizar todos os agendamentos
+   └─ Gerenciar profissionais e serviços
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+⚠️  NOTAS IMPORTANTES
+═══════════════════════════════════════════════════════════════════════════
+
+✓ Todos os usuários de teste usam a MESMA SENHA: 123456
+  (Você pode alterar isso atualizar os usuários no banco)
+
+✓ O token JWT expira em 1 dia (configurável em .env)
+
+✓ Depois que o token expira, é necessário fazer login novamente
+
+✓ Para alterar senha de um usuário, use a API:
+  PUT /api/v1/usuarios/:id
+  Body: { "senha": "nova_senha" }
+
+✓ Em produção, ALTERE sempre as senhas e o JWT_SECRET
+
+✓ Os usuários de teste estão no banco de dados e sobrevivem
+  a reinicializações (a menos que você execute: docker-compose down -v)
+
+
+═══════════════════════════════════════════════════════════════════════════
+
+🔗 LINKS ÚTEIS
+═══════════════════════════════════════════════════════════════════════════
+
+API rodando:           http://localhost:3000
+Health Check:          http://localhost:3000/health
+Repositório GitHub:    https://github.com/RaulNeto06/BellaGuestV1
+
+═══════════════════════════════════════════════════════════════════════════
+
+Criado em: 2026-03-04
+Desenvolvedor: RaulNeto06
+Versão: 1.0.0

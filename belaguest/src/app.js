@@ -3,7 +3,7 @@ const cors = require('cors');
 const morgan = require('morgan');
 const path = require('path');
 const { testConnection } = require('./config/database');
-const routes = require('./routes');
+const routes = require('./api/routes');
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();

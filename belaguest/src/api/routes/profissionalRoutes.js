@@ -1,9 +1,9 @@
 const express = require('express');
 const profissionalController = require('../controllers/profissionalController');
-const authMiddleware = require('../middlewares/authMiddleware');
-const roleMiddleware = require('../middlewares/roleMiddleware');
-const validateRequest = require('../middlewares/validateRequest');
-const { profissionalValidator, idParamValidator, minhaDisponibilidadeValidator } = require('./validators');
+const authMiddleware = require('../../middlewares/authMiddleware');
+const roleMiddleware = require('../../middlewares/roleMiddleware');
+const validateRequest = require('../../middlewares/validateRequest');
+const { profissionalValidator, idParamValidator, minhaDisponibilidadeValidator } = require('../validators/validators');
 
 const router = express.Router();
 
@@ -16,6 +16,14 @@ router.patch(
   minhaDisponibilidadeValidator,
   validateRequest,
   profissionalController.updateMyAvailability
+);
+router.get('/me/servicos', authMiddleware, roleMiddleware(['FUNCIONARIO']), profissionalController.getMyServices);
+router.patch(
+  '/me/servicos',
+  authMiddleware,
+  roleMiddleware(['FUNCIONARIO']),
+  validateRequest,
+  profissionalController.updateMyServices
 );
 router.get('/:id', authMiddleware, idParamValidator, validateRequest, profissionalController.detail);
 router.post(

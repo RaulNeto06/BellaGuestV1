@@ -1,9 +1,9 @@
 const express = require('express');
 const servicoController = require('../controllers/servicoController');
-const authMiddleware = require('../middlewares/authMiddleware');
-const roleMiddleware = require('../middlewares/roleMiddleware');
-const validateRequest = require('../middlewares/validateRequest');
-const { servicoValidator, idParamValidator } = require('./validators');
+const authMiddleware = require('../../middlewares/authMiddleware');
+const roleMiddleware = require('../../middlewares/roleMiddleware');
+const validateRequest = require('../../middlewares/validateRequest');
+const { servicoValidator, idParamValidator } = require('../validators/validators');
 
 const router = express.Router();
 

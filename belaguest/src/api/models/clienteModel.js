@@ -1,4 +1,4 @@
-const { pool } = require('../config/database');
+const { pool } = require('../../config/database');
 
 async function createCliente({ idUsuario, telefone }) {
   const [result] = await pool.execute(

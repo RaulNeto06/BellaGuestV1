@@ -63,6 +63,23 @@ async function remove(req, res, next) {
   }
 }
 
+async function updateMyServices(req, res, next) {
+  try {
+    const result = await profissionalService.updateServicosByUserId(req.user.id, req.body.idsServicos);
+    return res.status(200).json(result);
+  } catch (error) {
+    return next(error);
+  }
+}
+
+async function getMyServices(req, res, next) {
+  try {
+    const profissional = await profissionalService.detailByUserId(req.user.id);
+    return res.status(200).json(profissional.servicos);
+  } catch (error) {
+    return next(error);
+  }
+}
 module.exports = {
   create,
   list,
@@ -70,5 +87,7 @@ module.exports = {
   me,
   update,
   updateMyAvailability,
+  updateMyServices,
+  getMyServices,
   remove
 };

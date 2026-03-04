@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const { pool } = require('../config/database');
+const { pool } = require('../../config/database');
 const HttpError = require('./httpError');
 const userModel = require('../models/userModel');
 const clienteModel = require('../models/clienteModel');

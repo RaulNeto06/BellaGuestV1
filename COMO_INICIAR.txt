@@ -1,0 +1,232 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                     BELAGUEST - GUIA DE INICIALIZAÇÃO                       ║
+║                Sistema de Agendamento para Salão de Beleza                  ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+📋 ESTRUTURA DO PROJETO
+═══════════════════════════════════════════════════════════════════════════
+
+belaguest/
+├── src/
+│   ├── api/                    # API da aplicação
+│   │   ├── controllers/        # Controllers da API
+│   │   ├── models/             # Modelos de dados
+│   │   ├── routes/             # Rotas da aplicação
+│   │   ├── services/           # Lógica de negócio
+│   │   └── validators/         # Validadores de requisições
+│   ├── config/                 # Configurações
+│   │   ├── database.js         # Conexão com MySQL
+│   │   ├── env.js              # Variáveis de ambiente
+│   │   └── socket.js           # Configuração WebSocket
+│   ├── middlewares/            # Middlewares Express
+│   │   ├── authMiddleware.js   # Autenticação JWT
+│   │   ├── roleMiddleware.js   # Validação de permissões
+│   │   ├── errorHandler.js     # Tratamento de erros
+│   │   └── validateRequest.js  # Validação de requisições
+│   ├── utils/                  # Utilitários
+│   ├── public/                 # Arquivos estáticos (HTML, CSS, JS)
+│   ├── app.js                  # Configuração da aplicação Express
+│   └── server.js               # Servidor HTTP principal
+├── database/
+│   └── init.sql                # Script de inicialização do banco
+├── docker-compose.yml          # Orquestração de containers
+├── Dockerfile                  # Imagem Docker
+├── package.json                # Dependências do projeto
+└── .env                        # Variáveis de ambiente
+
+═══════════════════════════════════════════════════════════════════════════
+
+🚀 COMO INICIAR A APLICAÇÃO
+═══════════════════════════════════════════════════════════════════════════
+
+OPÇÃO 1: Com Docker Compose (RECOMENDADO)
+─────────────────────────────────────────────────────────────────────────
+
+1. Acesse o diretório do projeto:
+   $ cd /workspaces/BellaGuestV1/belaguest
+
+2. Inicie os containers (API + MySQL):
+   $ docker-compose up
+
+3. A aplicação estará disponível em:
+   http://localhost:3000
+
+Para parar a aplicação:
+   $ docker-compose down
+
+Para parar e remover volumes:
+   $ docker-compose down -v
+
+
+OPÇÃO 2: Localmente com Node.js (REQUER BANCO DE DADOS EXTERNO)
+─────────────────────────────────────────────────────────────────────────
+
+1. Acesse o diretório:
+   $ cd /workspaces/BellaGuestV1/belaguest
+
+2. Certifique-se que MongoDB/MySQL está rodando
+
+3. Configure as variáveis no arquivo .env
+
+4. Instale as dependências:
+   $ npm install
+
+5. Inicie em modo desenvolvimento (com auto-reload):
+   $ npm run dev
+
+6. Ou inicie em modo produção:
+   $ npm start
+
+═══════════════════════════════════════════════════════════════════════════
+
+🔧 CONFIGURAÇÃO DO BANCO DE DADOS
+═══════════════════════════════════════════════════════════════════════════
+
+O arquivo .env contém as configurações padrão:
+
+DB_HOST=mysql              # Host do MySQL
+DB_USER=belaguest_user     # Usuário do banco
+DB_PASSWORD=belaguest_pass # Senha do usuário
+DB_NAME=belaguest          # Nome da base de dados
+PORT=3000                  # Porta da aplicação
+JWT_SECRET=super_secret_change_me    # Chave JWT (ALTERAR EM PRODUÇÃO)
+JWT_EXPIRES_IN=1d                     # Expiração do token
+
+O script de inicialização do banco está em: database/init.sql
+
+═══════════════════════════════════════════════════════════════════════════
+
+📌 ENDPOINTS PRINCIPAIS DA API
+═══════════════════════════════════════════════════════════════════════════
+
+Health Check:
+   GET /health                    # Verificar status da api e banco
+
+Autenticação:
+   POST /api/v1/auth/register     # Registrar novo usuário
+   POST /api/v1/auth/login        # Fazer login
+   GET /api/v1/auth/me            # Obter dados do usuário logado (JWT)
+
+Serviços:
+   GET /api/v1/servicos           # Listar serviços
+   POST /api/v1/servicos          # Criar novo serviço (ADM)
+   PUT /api/v1/servicos/:id       # Editar serviço (ADM)
+   DELETE /api/v1/servicos/:id    # Deletar serviço (ADM)
+
+Profissionais:
+   GET /api/v1/profissionais           # Listar profissionais
+   GET /api/v1/profissionais/:id       # Obter detalhes do profissional
+   GET /api/v1/profissionais/minha-disponibilidade  # Sua disponibilidade (JWT)
+   POST /api/v1/profissionais          # Criar profissional (ADM)
+
+Agendamentos:
+   GET /api/v1/agendamentos             # Listar agendamentos (filtrado por permissão)
+   POST /api/v1/agendamentos            # Criar novo agendamento
+   PUT /api/v1/agendamentos/:id         # Atualizar agendamento
+   DELETE /api/v1/agendamentos/:id      # Cancelar agendamento
+
+Dashboard:
+   GET /api/v1/dashboard/resumo         # Resumo do dia (ADM/PROFISSIONAL)
+
+Usuários:
+   GET /api/v1/usuarios/:id             # Obter dados do usuário
+   PUT /api/v1/usuarios/:id             # Atualizar dados do usuário
+
+═══════════════════════════════════════════════════════════════════════════
+
+🔐 TIPOS DE USUÁRIO
+═══════════════════════════════════════════════════════════════════════════
+
+1. ADMINISTRADOR (ADM)
+   - Acesso total à aplicação
+   - Pode gerenciar serviços, profissionais e usuários
+   - Pode acessar o dashboard
+
+2. PROFISSIONAL (FUNCIONÁRIO)
+   - Pode gerenciar sua própria disponibilidade
+   - Pode visualizar seus agendamentos
+   - Pode acessar o dashboard com seus dados
+
+3. CLIENTE
+   - Pode agendar serviços
+   - Pode visualizar seus próprios agendamentos
+   - Pode atualizar seus dados pessoais
+
+═══════════════════════════════════════════════════════════════════════════
+
+🧪 VERIFICAR SE A APLICAÇÃO ESTÁ RODANDO
+═══════════════════════════════════════════════════════════════════════════
+
+Via cURL:
+   $ curl http://localhost:3000/health
+
+Via navegador:
+   Acesse: http://localhost:3000
+
+A resposta esperada será similar a:
+   {
+     "status": "ok",
+     "service": "BelaGuest API",
+     "database": "connected"
+   }
+
+═══════════════════════════════════════════════════════════════════════════
+
+📝 LOGS E DEBUGGING
+═══════════════════════════════════════════════════════════════════════════
+
+Com Docker Compose:
+   $ docker-compose logs -f api       # Logs da API
+   $ docker-compose logs -f mysql     # Logs do MySQL
+   $ docker-compose logs -f           # Logs de ambos
+
+Verificar containers rodando:
+   $ docker ps
+
+Acessar logs de um container:
+   $ docker logs <container_name>
+
+═══════════════════════════════════════════════════════════════════════════
+
+💡 DICAS
+═══════════════════════════════════════════════════════════════════════════
+
+- Em modo desenvolvimento (npm run dev), a aplicação recarrega automaticamente
+  quando há mudanças nos arquivos
+
+- Os tokens JWT expiram em 1 dia (configurável em .env)
+
+- A autenticação é feita via header Authorization com Bearer token:
+  Authorization: Bearer <token_jwt>
+
+- O banco de dados é inicializado automaticamente com o script init.sql
+
+- Para resetar o banco com Docker, use: docker-compose down -v
+
+═══════════════════════════════════════════════════════════════════════════
+
+❌ TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════════════
+
+Problema: Porta 3000 já está em uso
+Solução: 
+   $ lsof -i :3000  # Identifica o processo
+   $ kill -9 <PID>  # Mata o processo
+
+Problema: Banco de dados não conecta
+Solução:
+   - Verifica se o container MySQL está rodando: docker ps
+   - Se não estiver: docker-compose up
+
+Problema: Erro ao instalar dependências npm
+Solução:
+   $ rm -rf node_modules package-lock.json
+   $ npm install
+
+═══════════════════════════════════════════════════════════════════════════
+
+📧 CONTATO E SUPORTE
+═══════════════════════════════════════════════════════════════════════════
+
+Desenvolvedor: RaulNeto06
+Repositório: https://github.com/RaulNeto06/BellaGuestV1

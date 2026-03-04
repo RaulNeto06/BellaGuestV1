@@ -25,7 +25,6 @@ async function create(payload) {
   const profissional = await profissionalModel.createProfissional({
     idUsuario,
     nome: payload.nome,
-    especialidade: payload.especialidade,
     telefone: payload.telefone,
     intervaloMinutos: payload.intervaloMinutos || 60,
     status: payload.status || 'ATIVO'
@@ -86,7 +85,6 @@ async function update(id, payload) {
   await profissionalModel.updateProfissional(id, {
     idUsuario,
     nome: payload.nome,
-    especialidade: payload.especialidade,
     telefone: payload.telefone,
     intervaloMinutos: payload.intervaloMinutos || existing.intervaloMinutos || 60,
     status: payload.status
@@ -121,13 +119,23 @@ async function updateAvailabilityByUserId(idUsuario, payload) {
   await profissionalModel.updateProfissional(profissional.id, {
     idUsuario: profissional.idUsuario,
     nome: profissional.nome,
-    especialidade: profissional.especialidade,
     telefone: profissional.telefone,
-    intervaloMinutos: payload.intervaloMinutos,
+    intervaloMinutos: payload.intervaloMinutos || profissional.intervaloMinutos,
     status: profissional.status
   });
 
   await profissionalModel.replaceDisponibilidade(profissional.id, payload.disponibilidades);
+
+  return detail(profissional.id);
+}
+
+async function updateServicosByUserId(idUsuario, idsServicos) {
+  const profissional = await profissionalModel.findProfissionalByUserId(idUsuario);
+  if (!profissional) {
+    throw new HttpError('Não há perfil profissional vinculado para este usuário.', 404);
+  }
+
+  await profissionalModel.replaceServicosDoProfissional(profissional.id, idsServicos);
 
   return detail(profissional.id);
 }
@@ -139,5 +147,6 @@ module.exports = {
   detailByUserId,
   update,
   updateAvailabilityByUserId,
+  updateServicosByUserId,
   remove
 };

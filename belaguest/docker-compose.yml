@@ -9,10 +9,7 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
-    command: npm run dev
+    command: npm start
 
   mysql:
     image: mysql:8.0

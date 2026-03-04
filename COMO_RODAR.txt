@@ -1,0 +1,126 @@
+========================================================
+  COMO RODAR O SITE - BellaGuest
+========================================================
+
+Este guia explica como executar o sistema BellaGuest
+localmente, usando Docker (recomendado) ou Node.js puro.
+
+--------------------------------------------------------
+PRÉ-REQUISITOS
+--------------------------------------------------------
+
+OPÇÃO 1 - Docker (recomendado):
+  - Docker Desktop instalado e em execução
+    Download: https://www.docker.com/products/docker-desktop
+
+OPÇÃO 2 - Node.js local:
+  - Node.js v18 ou superior instalado
+    Download: https://nodejs.org
+  - MySQL 8.0 instalado e em execução
+    Download: https://dev.mysql.com/downloads/mysql/
+
+--------------------------------------------------------
+OPÇÃO 1: RODAR COM DOCKER (recomendado)
+--------------------------------------------------------
+
+1. Abra o terminal (Prompt de Comando, PowerShell ou Terminal).
+
+2. Navegue até a pasta do projeto:
+   cd belaguest
+
+3. Copie o arquivo de variáveis de ambiente:
+   cp .env.example .env
+
+   (No Windows use: copy .env.example .env)
+
+4. Inicie todos os serviços (API + banco de dados):
+   docker compose up --build
+
+5. Aguarde até ver a mensagem:
+   "Servidor rodando na porta 3000"
+
+6. Acesse no navegador:
+   http://localhost:3000
+
+Para parar o servidor, pressione Ctrl+C no terminal e, em
+seguida, execute:
+   docker compose down
+
+--------------------------------------------------------
+OPÇÃO 2: RODAR LOCALMENTE (Node.js + MySQL)
+--------------------------------------------------------
+
+1. Garanta que o MySQL está rodando e crie o banco de dados
+   executando o script:
+   database/init.sql
+
+2. Abra o terminal e navegue até a pasta do projeto:
+   cd belaguest
+
+3. Copie e configure as variáveis de ambiente:
+   cp .env.example .env
+   (No Windows use: copy .env.example .env)
+
+   Edite o arquivo .env e ajuste as credenciais do MySQL:
+     DB_HOST=localhost
+     DB_USER=<seu_usuario_mysql>
+     DB_PASSWORD=<sua_senha_mysql>
+     DB_NAME=belaguest
+     PORT=3000
+     JWT_SECRET=super_secret_change_me
+     JWT_EXPIRES_IN=1d
+
+4. Instale as dependências:
+   npm install
+
+5. Inicie o servidor em modo de desenvolvimento:
+   npm run dev
+
+   Ou em modo de produção:
+   npm start
+
+6. Aguarde até ver a mensagem:
+   "Servidor rodando na porta 3000"
+
+7. Acesse no navegador:
+   http://localhost:3000
+
+Para parar o servidor, pressione Ctrl+C no terminal.
+
+--------------------------------------------------------
+USUÁRIO ADMINISTRADOR PADRÃO
+--------------------------------------------------------
+
+  E-mail : admin@belaguest.com
+  Senha  : admin123
+
+  (Altere a senha após o primeiro acesso!)
+
+--------------------------------------------------------
+ESTRUTURA DE ACESSO
+--------------------------------------------------------
+
+  /              → Página de login / cadastro
+  (após login)
+  Área cliente   → Calendário, agendamentos
+  Área funcionário → Agenda do próprio profissional
+  Área admin     → Dashboard, profissionais, serviços
+
+--------------------------------------------------------
+PROBLEMAS COMUNS
+--------------------------------------------------------
+
+"Port 3000 already in use":
+  Altere o valor PORT no arquivo .env para outra porta,
+  por exemplo PORT=3001, e tente novamente.
+
+"Cannot connect to MySQL":
+  - Verifique se o MySQL está em execução.
+  - Confira usuário, senha e nome do banco no .env.
+  - Com Docker: aguarde o healthcheck do MySQL terminar
+    antes de acessar a API.
+
+"docker: command not found":
+  Instale o Docker Desktop: https://www.docker.com/products/docker-desktop
+
+========================================================

@@ -12,7 +12,8 @@ services:
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-    command: npm run dev
+    dns_search: "."
+    command: npm start
 
   mysql:
     image: mysql:8.0

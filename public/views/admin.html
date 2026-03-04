@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BelaGuest – Administração</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <header class="page-header">
+    <div class="logo">Bela<span>Guest</span></div>
+    <div class="user-info">
+      <strong id="header-nome">Carregando…</strong>
+      <span>Administrador</span>
+    </div>
+    <button class="btn btn-ghost btn-sm" id="btn-logout" style="color:rgba(255,255,255,0.8)">Sair</button>
+  </header>
+
+  <div class="main-layout">
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <button class="sidebar-item active" data-section="dashboard">
+          <span class="icon">📊</span> Dashboard
+        </button>
+        <button class="sidebar-item" data-section="agendamentos">
+          <span class="icon">📅</span> Agendamentos
+        </button>
+        <button class="sidebar-item" data-section="profissionais">
+          <span class="icon">💼</span> Profissionais
+        </button>
+        <button class="sidebar-item" data-section="servicos">
+          <span class="icon">💅</span> Serviços
+        </button>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <!-- Dashboard -->
+      <section id="section-dashboard" class="tab-content active">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Dashboard</div>
+            <div class="section-subtitle" id="dash-date"></div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="adminPage.loadDashboard()">🔄 Atualizar</button>
+        </div>
+
+        <div class="stats-grid mb-2">
+          <div class="stat-card stat-pink">
+            <div class="stat-icon">📋</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-total">–</div>
+              <div class="stat-label">Hoje no total</div>
+            </div>
+          </div>
+          <div class="stat-card stat-orange">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-pendente">–</div>
+              <div class="stat-label">Pendentes</div>
+            </div>
+          </div>
+          <div class="stat-card stat-green">
+            <div class="stat-icon">✅</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-confirmado">–</div>
+              <div class="stat-label">Confirmados</div>
+            </div>
+          </div>
+          <div class="stat-card stat-purple">
+            <div class="stat-icon">🎉</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-concluido">–</div>
+              <div class="stat-label">Concluídos</div>
+            </div>
+          </div>
+          <div class="stat-card stat-red">
+            <div class="stat-icon">❌</div>
+            <div class="stat-info">
+              <div class="stat-value" id="stat-cancelado">–</div>
+              <div class="stat-label">Cancelados</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h3>Agendamentos de Hoje</h3>
+          </div>
+          <div class="card-body" id="dash-agenda-list">
+            <div class="loading-overlay"><div class="spinner"></div></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Agendamentos -->
+      <section id="section-agendamentos" class="tab-content">
+        <div class="section-header">
+          <div class="section-title">Gerenciar Agendamentos</div>
+        </div>
+        <div class="card mb-2">
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Data inicial</label>
+                <input type="date" id="ag-start" class="form-control" />
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Data final</label>
+                <input type="date" id="ag-end" class="form-control" />
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Profissional</label>
+                <select id="ag-prof" class="form-control form-select">
+                  <option value="">Todos</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Status</label>
+                <select id="ag-status" class="form-control form-select">
+                  <option value="">Todos</option>
+                  <option value="pendente">Pendente</option>
+                  <option value="confirmado">Confirmado</option>
+                  <option value="concluido">Concluído</option>
+                  <option value="cancelado">Cancelado</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0;align-self:flex-end">
+                <button class="btn btn-primary w-full" id="btn-ag-filter">Filtrar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Data</th><th>Horário</th><th>Cliente</th>
+                  <th>Serviço</th><th>Profissional</th><th>Status</th><th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="ag-tbody">
+                <tr><td colspan="7" style="text-align:center;padding:2rem"><div class="spinner" style="margin:auto"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Profissionais -->
+      <section id="section-profissionais" class="tab-content">
+        <div class="section-header">
+          <div class="section-title">Gerenciar Profissionais</div>
+          <button class="btn btn-primary" id="btn-new-prof">+ Novo Profissional</button>
+        </div>
+        <div class="card">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>Nome</th><th>Especialidade</th><th>Telefone</th><th>Status</th><th>Ações</th></tr>
+              </thead>
+              <tbody id="prof-tbody">
+                <tr><td colspan="5" style="text-align:center;padding:2rem"><div class="spinner" style="margin:auto"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Serviços -->
+      <section id="section-servicos" class="tab-content">
+        <div class="section-header">
+          <div class="section-title">Gerenciar Serviços</div>
+          <button class="btn btn-primary" id="btn-new-serv">+ Novo Serviço</button>
+        </div>
+        <div class="card">
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>Nome</th><th>Duração</th><th>Preço</th><th>Descrição</th><th>Ações</th></tr>
+              </thead>
+              <tbody id="serv-tbody">
+                <tr><td colspan="5" style="text-align:center;padding:2rem"><div class="spinner" style="margin:auto"></div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal Profissional -->
+  <div class="modal-overlay hidden" id="modal-prof">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="prof-modal-title">Novo Profissional</h3>
+        <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-prof')">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="prof-id" />
+        <div class="form-group">
+          <label class="form-label">Nome *</label>
+          <input type="text" id="prof-nome" class="form-control" placeholder="Nome completo" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Especialidade</label>
+          <input type="text" id="prof-especialidade" class="form-control" placeholder="Ex: Cabelo e Coloração" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Telefone</label>
+          <input type="tel" id="prof-telefone" class="form-control" placeholder="(11) 99999-0000" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select id="prof-status" class="form-control form-select">
+            <option value="ativo">Ativo</option>
+            <option value="inativo">Inativo</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-prof')">Cancelar</button>
+        <button class="btn btn-primary" id="btn-save-prof">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Serviço -->
+  <div class="modal-overlay hidden" id="modal-serv">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="serv-modal-title">Novo Serviço</h3>
+        <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-serv')">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="serv-id" />
+        <div class="form-group">
+          <label class="form-label">Nome *</label>
+          <input type="text" id="serv-nome" class="form-control" placeholder="Ex: Manicure" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Descrição</label>
+          <textarea id="serv-desc" class="form-control" rows="2" placeholder="Descrição do serviço"></textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div class="form-group">
+            <label class="form-label">Duração (min) *</label>
+            <input type="number" id="serv-duracao" class="form-control" value="60" min="15" step="15" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Preço (R$) *</label>
+            <input type="number" id="serv-preco" class="form-control" placeholder="0.00" min="0" step="0.01" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-serv')">Cancelar</button>
+        <button class="btn btn-primary" id="btn-save-serv">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Status Agendamento -->
+  <div class="modal-overlay hidden" id="modal-ag-status">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Atualizar Agendamento</h3>
+        <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-ag-status')">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="ag-status-id" />
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select id="ag-new-status" class="form-control form-select">
+            <option value="pendente">Pendente</option>
+            <option value="confirmado">Confirmado</option>
+            <option value="concluido">Concluído</option>
+            <option value="cancelado">Cancelado</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Observações</label>
+          <textarea id="ag-obs" class="form-control" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-ag-status')">Cancelar</button>
+        <button class="btn btn-primary" id="btn-save-ag-status">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>

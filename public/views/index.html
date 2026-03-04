@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BelaGuest – Agendamento de Salão</title>
+  <link rel="stylesheet" href="/css/style.css" />
+  <style>
+    .divider { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 1.25rem 0; }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <div class="hero-card">
+      <div class="hero-logo">
+        <div class="brand">Bela<span>Guest</span></div>
+        <div class="tagline">✨ Beleza ao seu alcance</div>
+      </div>
+
+      <div class="hero-tabs">
+        <button class="hero-tab active" data-tab="login">Entrar</button>
+        <button class="hero-tab" data-tab="register">Cadastrar</button>
+      </div>
+
+      <!-- Login -->
+      <div class="hero-form active" id="form-login">
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <input type="email" id="login-email" class="form-control" placeholder="seu@email.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <input type="password" id="login-senha" class="form-control" placeholder="••••••••" />
+          <div class="form-error hidden" id="login-error"></div>
+        </div>
+        <button class="btn btn-primary" id="btn-login">Entrar</button>
+      </div>
+
+      <!-- Register -->
+      <div class="hero-form" id="form-register">
+        <div class="form-group">
+          <label class="form-label">Nome completo</label>
+          <input type="text" id="reg-nome" class="form-control" placeholder="Seu nome" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">E-mail</label>
+          <input type="email" id="reg-email" class="form-control" placeholder="seu@email.com" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Telefone</label>
+          <input type="tel" id="reg-telefone" class="form-control" placeholder="(11) 99999-9999" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Senha</label>
+          <input type="password" id="reg-senha" class="form-control" placeholder="mínimo 6 caracteres" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Confirmar Senha</label>
+          <input type="password" id="reg-senha2" class="form-control" placeholder="repita a senha" />
+          <div class="form-error hidden" id="reg-error"></div>
+        </div>
+        <button class="btn btn-primary" id="btn-register">Criar conta</button>
+      </div>
+
+      <div class="hero-features">
+        <span class="hero-feature">💅 Manicure</span>
+        <span class="hero-feature">✂️ Cortes</span>
+        <span class="hero-feature">💆 Estética</span>
+        <span class="hero-feature">👁️ Cílios</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+  <script>
+    // Tab switching
+    document.querySelectorAll('.hero-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.hero-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.hero-form').forEach(f => f.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('form-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // Login
+    document.getElementById('btn-login').addEventListener('click', async () => {
+      const email = document.getElementById('login-email').value.trim();
+      const senha = document.getElementById('login-senha').value;
+      const errEl = document.getElementById('login-error');
+      errEl.classList.add('hidden');
+      if (!email || !senha) { errEl.textContent = 'Preencha todos os campos'; errEl.classList.remove('hidden'); return; }
+      const btn = document.getElementById('btn-login');
+      btn.disabled = true; btn.textContent = 'Entrando…';
+      try {
+        const res = await api.post('/auth/login', { email, senha });
+        app.setAuth(res.data.token, res.data.usuario);
+        app.redirectByRole(res.data.usuario.tipoUsuario);
+      } catch (e) {
+        errEl.textContent = e.message || 'Credenciais inválidas';
+        errEl.classList.remove('hidden');
+      } finally { btn.disabled = false; btn.textContent = 'Entrar'; }
+    });
+
+    // Register
+    document.getElementById('btn-register').addEventListener('click', async () => {
+      const nome = document.getElementById('reg-nome').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const telefone = document.getElementById('reg-telefone').value.trim();
+      const senha = document.getElementById('reg-senha').value;
+      const senha2 = document.getElementById('reg-senha2').value;
+      const errEl = document.getElementById('reg-error');
+      errEl.classList.add('hidden');
+      if (!nome || !email || !senha) { errEl.textContent = 'Preencha todos os campos obrigatórios'; errEl.classList.remove('hidden'); return; }
+      if (senha.length < 6) { errEl.textContent = 'Senha deve ter no mínimo 6 caracteres'; errEl.classList.remove('hidden'); return; }
+      if (senha !== senha2) { errEl.textContent = 'As senhas não conferem'; errEl.classList.remove('hidden'); return; }
+      const btn = document.getElementById('btn-register');
+      btn.disabled = true; btn.textContent = 'Criando conta…';
+      try {
+        const res = await api.post('/auth/register', { nome, email, senha, telefone });
+        app.setAuth(res.data.token, res.data.usuario);
+        app.redirectByRole(res.data.usuario.tipoUsuario);
+      } catch (e) {
+        errEl.textContent = e.message || 'Erro ao criar conta';
+        errEl.classList.remove('hidden');
+      } finally { btn.disabled = false; btn.textContent = 'Criar conta'; }
+    });
+
+    // Enter key support
+    document.getElementById('login-senha').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btn-login').click(); });
+    document.getElementById('reg-senha2').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btn-register').click(); });
+
+    // Redirect if already logged in
+    const auth = app.getAuth();
+    if (auth) app.redirectByRole(auth.usuario.tipoUsuario);
+  </script>
+</body>
+</html>

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BelaGuest – Minha Área</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="page-header">
+    <div class="logo">Bela<span>Guest</span></div>
+    <div class="user-info">
+      <strong id="header-nome">Carregando…</strong>
+      <span>Cliente</span>
+    </div>
+    <button class="btn btn-ghost btn-sm" id="btn-logout" style="color:rgba(255,255,255,0.8)">Sair</button>
+  </header>
+
+  <div class="main-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <button class="sidebar-item active" data-section="agendar">
+          <span class="icon">📅</span> Novo Agendamento
+        </button>
+        <button class="sidebar-item" data-section="meus">
+          <span class="icon">📋</span> Meus Agendamentos
+        </button>
+        <button class="sidebar-item" data-section="perfil">
+          <span class="icon">👤</span> Meu Perfil
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <main class="main-content">
+      <!-- Section: Novo Agendamento -->
+      <section id="section-agendar" class="tab-content active">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Novo Agendamento</div>
+            <div class="section-subtitle">Escolha um serviço, profissional e horário</div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="card mb-2">
+          <div class="card-body">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Serviço</label>
+                <select id="filter-servico" class="form-control form-select">
+                  <option value="">Qualquer serviço</option>
+                </select>
+              </div>
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Profissional</label>
+                <select id="filter-profissional" class="form-control form-select">
+                  <option value="">Qualquer profissional</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:auto 1fr;gap:1.5rem;align-items:start">
+          <!-- Calendar -->
+          <div style="min-width:280px">
+            <div id="calendar-cliente" class="calendar-wrapper"></div>
+          </div>
+
+          <!-- Slots panel -->
+          <div id="slots-panel">
+            <div class="card">
+              <div class="card-header">
+                <h3 id="slots-title">Selecione uma data</h3>
+              </div>
+              <div class="card-body" id="slots-body">
+                <div class="empty-state">
+                  <div class="empty-icon">📅</div>
+                  <p>Clique em um dia no calendário para ver os horários disponíveis</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Meus Agendamentos -->
+      <section id="section-meus" class="tab-content">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Meus Agendamentos</div>
+            <div class="section-subtitle">Histórico e próximos agendamentos</div>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="clientePage.loadMeus()">🔄 Atualizar</button>
+        </div>
+        <div class="nav-tabs mb-2">
+          <button class="nav-tab active" data-tab-filter="todos">Todos</button>
+          <button class="nav-tab" data-tab-filter="pendente">Pendentes</button>
+          <button class="nav-tab" data-tab-filter="confirmado">Confirmados</button>
+          <button class="nav-tab" data-tab-filter="concluido">Concluídos</button>
+          <button class="nav-tab" data-tab-filter="cancelado">Cancelados</button>
+        </div>
+        <div id="meus-list">
+          <div class="loading-overlay"><div class="spinner"></div></div>
+        </div>
+      </section>
+
+      <!-- Section: Perfil -->
+      <section id="section-perfil" class="tab-content">
+        <div class="section-header">
+          <div class="section-title">Meu Perfil</div>
+        </div>
+        <div class="card" style="max-width:480px">
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Nome</label>
+              <input type="text" id="perfil-nome" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">E-mail</label>
+              <input type="email" id="perfil-email" class="form-control" disabled />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Telefone</label>
+              <input type="tel" id="perfil-telefone" class="form-control" />
+            </div>
+            <button class="btn btn-primary" id="btn-save-perfil">Salvar</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Booking Modal -->
+  <div class="modal-overlay hidden" id="modal-booking">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Confirmar Agendamento</h3>
+        <button class="btn btn-ghost btn-icon" id="close-modal-booking">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="card" style="background:var(--gray-100);box-shadow:none;margin-bottom:1rem">
+          <div class="card-body" style="padding:1rem">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;font-size:0.9rem">
+              <div><span class="text-muted">Data:</span><br><strong id="bk-data"></strong></div>
+              <div><span class="text-muted">Horário:</span><br><strong id="bk-horario"></strong></div>
+              <div><span class="text-muted">Profissional:</span><br><strong id="bk-profissional"></strong></div>
+              <div><span class="text-muted">Serviço:</span><br><strong id="bk-servico"></strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Observações (opcional)</label>
+          <textarea id="bk-obs" class="form-control" rows="3" placeholder="Alguma observação especial?"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="close-modal-booking2">Cancelar</button>
+        <button class="btn btn-primary" id="btn-confirm-booking">Confirmar Agendamento</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/calendar.js"></script>
+  <script src="/js/cliente.js"></script>
+</body>
+</html>

@@ -1,8 +1,8 @@
 const express = require('express');
-const agendamentoController = require('../controllers/agendamentoController');
-const authMiddleware = require('../../middlewares/authMiddleware');
-const roleMiddleware = require('../../middlewares/roleMiddleware');
-const validateRequest = require('../../middlewares/validateRequest');
+const agendamentoController = require('../controllers/agendamento-controller');
+const authMiddleware = require('../../middlewares/auth-middleware');
+const roleMiddleware = require('../../middlewares/role-middleware');
+const validateRequest = require('../../middlewares/validate-request');
 const {
   agendamentoCreateValidator,
   agendamentoUpdateValidator,

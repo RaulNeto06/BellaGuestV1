@@ -1,4 +1,4 @@
-const agendamentoModel = require('../models/agendamentoModel');
+const agendamentoModel = require('../models/agendamento-model');
 
 async function resumo({ data, idProfissional }) {
   const agendamentos = await agendamentoModel.listAgendamentos({ data, idProfissional });

@@ -1,5 +1,5 @@
-const HttpError = require('./httpError');
-const servicoModel = require('../models/servicoModel');
+const HttpError = require('./http-error');
+const servicoModel = require('../models/servico-model');
 
 async function create(payload) {
   return servicoModel.createServico(payload);

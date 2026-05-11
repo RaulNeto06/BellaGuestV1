@@ -8,5 +8,5 @@ const server = http.createServer(app);
 initSocket(server);
 
 server.listen(env.PORT, () => {
-  console.log(`BelaGuest API rodando na porta ${env.PORT}`);
+  // Server iniciado (log removido para produção)
 });

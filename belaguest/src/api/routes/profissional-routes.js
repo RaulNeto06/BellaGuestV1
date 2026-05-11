@@ -1,8 +1,8 @@
 const express = require('express');
-const profissionalController = require('../controllers/profissionalController');
-const authMiddleware = require('../../middlewares/authMiddleware');
-const roleMiddleware = require('../../middlewares/roleMiddleware');
-const validateRequest = require('../../middlewares/validateRequest');
+const profissionalController = require('../controllers/profissional-controller');
+const authMiddleware = require('../../middlewares/auth-middleware');
+const roleMiddleware = require('../../middlewares/role-middleware');
+const validateRequest = require('../../middlewares/validate-request');
 const { profissionalValidator, idParamValidator, minhaDisponibilidadeValidator } = require('../validators/validators');
 
 const router = express.Router();

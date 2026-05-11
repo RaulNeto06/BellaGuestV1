@@ -1,4 +1,4 @@
-const agendamentoService = require('../services/agendamentoService');
+const agendamentoService = require('../services/agendamento-service');
 
 async function create(req, res, next) {
   try {

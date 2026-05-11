@@ -1,8 +1,8 @@
-const agendamentoModel = require('../models/agendamentoModel');
-const clienteModel = require('../models/clienteModel');
-const profissionalModel = require('../models/profissionalModel');
-const servicoModel = require('../models/servicoModel');
-const HttpError = require('./httpError');
+const agendamentoModel = require('../models/agendamento-model');
+const clienteModel = require('../models/cliente-model');
+const profissionalModel = require('../models/profissional-model');
+const servicoModel = require('../models/servico-model');
+const HttpError = require('./http-error');
 const { getIO } = require('../../config/socket');
 
 function timeToMinutes(value) {

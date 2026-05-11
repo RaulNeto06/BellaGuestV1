@@ -1,4 +1,4 @@
-const profissionalService = require('../services/profissionalService');
+const profissionalService = require('../services/profissional-service');
 
 async function create(req, res, next) {
   try {

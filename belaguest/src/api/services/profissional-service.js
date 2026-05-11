@@ -1,6 +1,6 @@
-const HttpError = require('./httpError');
-const profissionalModel = require('../models/profissionalModel');
-const userModel = require('../models/userModel');
+const HttpError = require('./http-error');
+const profissionalModel = require('../models/profissional-model');
+const userModel = require('../models/user-model');
 
 async function validarVinculoUsuario(idUsuario) {
   if (!idUsuario) {

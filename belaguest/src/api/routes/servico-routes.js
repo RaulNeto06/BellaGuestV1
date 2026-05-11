@@ -1,8 +1,8 @@
 const express = require('express');
-const servicoController = require('../controllers/servicoController');
-const authMiddleware = require('../../middlewares/authMiddleware');
-const roleMiddleware = require('../../middlewares/roleMiddleware');
-const validateRequest = require('../../middlewares/validateRequest');
+const servicoController = require('../controllers/servico-controller');
+const authMiddleware = require('../../middlewares/auth-middleware');
+const roleMiddleware = require('../../middlewares/role-middleware');
+const validateRequest = require('../../middlewares/validate-request');
 const { servicoValidator, idParamValidator } = require('../validators/validators');
 
 const router = express.Router();

@@ -1,10 +1,10 @@
 const express = require('express');
-const authRoutes = require('./authRoutes');
-const servicoRoutes = require('./servicoRoutes');
-const profissionalRoutes = require('./profissionalRoutes');
-const agendamentoRoutes = require('./agendamentoRoutes');
-const dashboardRoutes = require('./dashboardRoutes');
-const userRoutes = require('./userRoutes');
+const authRoutes = require('./auth-routes');
+const servicoRoutes = require('./servico-routes');
+const profissionalRoutes = require('./profissional-routes');
+const agendamentoRoutes = require('./agendamento-routes');
+const dashboardRoutes = require('./dashboard-routes');
+const userRoutes = require('./user-routes');
 
 const router = express.Router();
 

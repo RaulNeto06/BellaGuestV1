@@ -1,8 +1,8 @@
 const bcrypt = require('bcryptjs');
 const { pool } = require('../../config/database');
-const HttpError = require('./httpError');
-const userModel = require('../models/userModel');
-const clienteModel = require('../models/clienteModel');
+const HttpError = require('./http-error');
+const userModel = require('../models/user-model');
+const clienteModel = require('../models/cliente-model');
 
 function normalizeEmail(email) {
   return String(email || '').trim().toLowerCase();

@@ -1,3 +1,7 @@
+// ===================================
+// === Module: State Management ===
+// ===================================
+
 const state = {
   token: localStorage.getItem('bg_token') || '',
   user: JSON.parse(localStorage.getItem('bg_user') || 'null'),
@@ -13,6 +17,10 @@ const state = {
 
 let funcionarioProfissionalCache = null;
 
+// ===================================
+// === Module: DOM References ===
+// ===================================
+
 const authSection = document.getElementById('authSection');
 const appSection = document.getElementById('appSection');
 const viewArea = document.getElementById('viewArea');
@@ -21,6 +29,15 @@ const alertBox = document.getElementById('alert');
 const welcomeTitle = document.getElementById('welcomeTitle');
 const welcomeSubtitle = document.getElementById('welcomeSubtitle');
 
+// ===================================
+// === Module: UI - Alerts ===
+// ===================================
+
+/**
+ * Exibe uma mensagem de alerta na tela
+ * @param {string} message - Mensagem a exibir
+ * @param {string} type - Tipo: 'info', 'success', 'warning', 'error'
+ */
 function showAlert(message, type = 'info') {
   alertBox.classList.remove('hidden', 'info', 'success', 'warning', 'error');
   alertBox.classList.add(type);
@@ -34,16 +51,28 @@ function showAlert(message, type = 'info') {
   
   alertBox.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i> ${message}`;
   
-  // Auto-hide after 5 seconds for success messages
   if (type === 'success' || type === 'info') {
     setTimeout(() => clearAlert(), 5000);
   }
 }
 
+/**
+ * Limpa o alerta da tela
+ */
 function clearAlert() {
   alertBox.classList.add('hidden');
 }
 
+// ===================================
+// === Module: API Communication ===
+// ===================================
+
+/**
+ * Faz uma requisição à API
+ * @param {string} path - Caminho da API
+ * @param {object} options - Opções da requisição (method, headers, body)
+ * @returns {Promise} Resposta da API
+ */
 async function api(path, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
   if (state.token) headers.Authorization = `Bearer ${state.token}`;
@@ -58,6 +87,15 @@ async function api(path, options = {}) {
   return data;
 }
 
+// ===================================
+// === Module: Session Management ===
+// ===================================
+
+/**
+ * Salva o token e usuário na sessão (localStorage)
+ * @param {string} token - Token JWT
+ * @param {object} user - Dados do usuário
+ */
 function saveSession(token, user) {
   state.token = token;
   state.user = user;
@@ -65,6 +103,9 @@ function saveSession(token, user) {
   localStorage.setItem('bg_user', JSON.stringify(user));
 }
 
+/**
+ * Limpa a sessão do usuário
+ */
 function clearSession() {
   state.token = '';
   state.user = null;
@@ -72,11 +113,21 @@ function clearSession() {
   localStorage.removeItem('bg_user');
 }
 
+/**
+ * Carrega dados iniciais (serviços e profissionais)
+ */
 async function bootstrapData() {
   state.servicos = await api('/servicos');
   state.profissionais = await api('/profissionais');
 }
 
+// ===================================
+// === Module: WebSocket / Socket.IO ===
+// ===================================
+
+/**
+ * Configura conexão em tempo real com socket.io
+ */
 function setupSocket() {
   if (state.socket) state.socket.disconnect();
   state.socket = io();
@@ -88,6 +139,14 @@ function setupSocket() {
   });
 }
 
+// ===================================
+// === Module: Navigation - Tabs ===
+// ===================================
+
+/**
+ * Retorna as abas disponíveis conforme o tipo de usuário
+ * @returns {array} Lista de abas
+ */
 function getTabsByRole() {
   const role = state.user?.tipoUsuario;
   if (role === 'CLIENTE') return [
@@ -109,6 +168,9 @@ function getTabsByRole() {
   ];
 }
 
+/**
+ * Renderiza as abas de navegação
+ */
 function renderRoleTabs() {
   const tabs = getTabsByRole();
   const tabNames = tabs.map(t => t.name);
@@ -128,10 +190,24 @@ function renderRoleTabs() {
   });
 }
 
+// ===================================
+// === Module: UI - Utilities ===
+// ===================================
+
+/**
+ * Formata uma data para exibição em pt-BR
+ * @param {string} dateStr - Data em formato YYYY-MM-DD
+ * @returns {string} Data formatada
+ */
 function formatDateDisplay(dateStr) {
   return new Date(`${dateStr}T00:00:00`).toLocaleDateString('pt-BR');
 }
 
+/**
+ * Renderiza um calendário HTML
+ * @param {Date} date - Data do mês a renderizar
+ * @returns {string} HTML do calendário
+ */
 function renderCalendar(date) {
   const year = date.getFullYear();
   const month = date.getMonth();
@@ -162,16 +238,54 @@ function renderCalendar(date) {
   return html;
 }
 
+/**
+ * Constrói opções de seleção para serviços
+ * @param {boolean} includeAny - Se deve incluir "Todos"
+ * @returns {string} HTML das opções
+ */
 function buildServiceOptions(includeAny = true) {
   const base = includeAny ? '<option value="">Todos os serviços</option>' : '';
   return base + state.servicos.map((s) => `<option value="${s.id}">${s.nome}</option>`).join('');
 }
 
+/**
+ * Constrói opções de seleção para profissionais
+ * @param {boolean} includeAny - Se deve incluir "Todos"
+ * @returns {string} HTML das opções
+ */
 function buildProfessionalOptions(includeAny = true) {
   const base = includeAny ? '<option value="">Todos os profissionais</option>' : '';
   return base + state.profissionais.map((p) => `<option value="${p.id}">${p.nome}</option>`).join('');
 }
 
+/**
+ * Vincula eventos aos controles do calendário
+ */
+function bindCalendarControls() {
+  document.getElementById('prevMonth').addEventListener('click', () => {
+    state.monthPointer = new Date(state.monthPointer.getFullYear(), state.monthPointer.getMonth() - 1, 1);
+    renderCurrentTab();
+  });
+  document.getElementById('nextMonth').addEventListener('click', () => {
+    state.monthPointer = new Date(state.monthPointer.getFullYear(), state.monthPointer.getMonth() + 1, 1);
+    renderCurrentTab();
+  });
+
+  viewArea.querySelectorAll('[data-date]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      state.selectedDate = btn.dataset.date;
+      renderCurrentTab();
+    });
+  });
+}
+
+// ===================================
+// === Module: Client - Calendar ===
+// ===================================
+
+/**
+ * Renderiza a tela de calendário do cliente
+ */
 async function renderClienteCalendario() {
   viewArea.innerHTML = `
     <div class="grid-2">
@@ -198,6 +312,9 @@ async function renderClienteCalendario() {
   await loadDisponibilidadeCliente();
 }
 
+/**
+ * Carrega a disponibilidade de horários para o cliente
+ */
 async function loadDisponibilidadeCliente() {
   const idServico = document.getElementById('filtroServico').value;
   const idProfissional = document.getElementById('filtroProfissional').value;
@@ -264,6 +381,13 @@ async function loadDisponibilidadeCliente() {
   });
 }
 
+// ===================================
+// === Module: Client - Appointments ===
+// ===================================
+
+/**
+ * Renderiza a tela de meus agendamentos
+ */
 async function renderMeusAgendamentos() {
   const list = await api('/agendamentos');
   
@@ -321,6 +445,13 @@ async function renderMeusAgendamentos() {
   });
 }
 
+// ===================================
+// === Module: Employee - Profile ===
+// ===================================
+
+/**
+ * Renderiza o perfil do funcionário
+ */
 async function renderFuncionarioPerfil() {
   try {
     funcionarioProfissionalCache = await api('/profissionais/me');
@@ -354,6 +485,13 @@ async function renderFuncionarioPerfil() {
   `;
 }
 
+// ===================================
+// === Module: Employee - Calendar ===
+// ===================================
+
+/**
+ * Renderiza o calendário do funcionário
+ */
 async function renderFuncionarioCalendario() {
   if (state.user?.tipoUsuario === 'ADMINISTRADOR') {
     return renderAdminCalendario();
@@ -532,6 +670,13 @@ async function renderFuncionarioCalendario() {
   await loadFuncionarioCalendario();
 }
 
+// ===================================
+// === Module: Admin - Calendar ===
+// ===================================
+
+/**
+ * Renderiza o calendário do administrador
+ */
 async function renderAdminCalendario() {
   if (!state.profissionais.length) {
     await bootstrapData();
@@ -635,6 +780,13 @@ async function renderAdminCalendario() {
   await loadAdminCalendario();
 }
 
+// ===================================
+// === Module: Employee - Day Appointments ===
+// ===================================
+
+/**
+ * Renderiza os agendamentos do dia do funcionário
+ */
 async function renderAgendamentosDia() {
   let profissional;
   try {
@@ -669,6 +821,9 @@ async function renderAgendamentosDia() {
   await loadAgendamentosDia();
 }
 
+/**
+ * Carrega os agendamentos do dia
+ */
 async function loadAgendamentosDia() {
   const data = document.getElementById('diaRef').value;
   state.selectedDate = data;
@@ -761,6 +916,11 @@ async function loadAgendamentosDia() {
   });
 }
 
+/**
+ * Atualiza o status de um agendamento
+ * @param {number} id - ID do agendamento
+ * @param {string} status - Novo status
+ */
 async function updateStatus(id, status) {
   const existing = state.agendamentosDiaCache.find((a) => a.id === Number(id));
   if (!existing) return;
@@ -780,6 +940,13 @@ async function updateStatus(id, status) {
   await loadAgendamentosDia();
 }
 
+// ===================================
+// === Module: Admin - Dashboard ===
+// ===================================
+
+/**
+ * Renderiza o dashboard do administrador
+ */
 async function renderDashboard() {
   const resumo = await api('/dashboard/resumo');
   viewArea.innerHTML = `
@@ -830,6 +997,13 @@ async function renderDashboard() {
   `;
 }
 
+// ===================================
+// === Module: Admin - Services ===
+// ===================================
+
+/**
+ * Renderiza a tela de gerenciamento de serviços
+ */
 async function renderAdminServicos() {
   viewArea.innerHTML = `
     <div class="grid-2">
@@ -915,6 +1089,13 @@ async function renderAdminServicos() {
   });
 }
 
+// ===================================
+// === Module: Admin - Professionals ===
+// ===================================
+
+/**
+ * Renderiza a tela de gerenciamento de profissionais
+ */
 async function renderAdminProfissionais() {
   viewArea.innerHTML = `
     <div class="grid-2">
@@ -1021,6 +1202,13 @@ async function renderAdminProfissionais() {
   });
 }
 
+// ===================================
+// === Module: Admin - Users ===
+// ===================================
+
+/**
+ * Renderiza a tela de gerenciamento de usuários
+ */
 async function renderAdminUsuarios() {
   const users = await api('/usuarios');
 
@@ -1152,6 +1340,13 @@ async function renderAdminUsuarios() {
   });
 }
 
+// ===================================
+// === Module: Admin - Reservations ===
+// ===================================
+
+/**
+ * Renderiza a tela de gerenciamento de reservas
+ */
 async function renderAdminReservas() {
   const list = await api('/agendamentos');
 
@@ -1197,24 +1392,13 @@ async function renderAdminReservas() {
   `;
 }
 
-function bindCalendarControls() {
-  document.getElementById('prevMonth').addEventListener('click', () => {
-    state.monthPointer = new Date(state.monthPointer.getFullYear(), state.monthPointer.getMonth() - 1, 1);
-    renderCurrentTab();
-  });
-  document.getElementById('nextMonth').addEventListener('click', () => {
-    state.monthPointer = new Date(state.monthPointer.getFullYear(), state.monthPointer.getMonth() + 1, 1);
-    renderCurrentTab();
-  });
+// ===================================
+// === Module: Render Current View ===
+// ===================================
 
-  viewArea.querySelectorAll('[data-date]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      state.selectedDate = btn.dataset.date;
-      renderCurrentTab();
-    });
-  });
-}
-
+/**
+ * Renderiza a view atual baseada na aba selecionada e tipo de usuário
+ */
 async function renderCurrentTab() {
   if (!state.user) return;
 
@@ -1241,6 +1425,13 @@ async function renderCurrentTab() {
   }
 }
 
+// ===================================
+// === Module: App Initialization ===
+// ===================================
+
+/**
+ * Entra na aplicação após autenticação
+ */
 async function enterApp() {
   authSection.classList.add('hidden');
   appSection.classList.remove('hidden');
@@ -1252,6 +1443,13 @@ async function enterApp() {
   await renderCurrentTab();
 }
 
+// ===================================
+// === Module: Authentication ===
+// ===================================
+
+/**
+ * Vincula eventos de autenticação (login/registro)
+ */
 function bindAuth() {
   document.querySelectorAll('[data-auth-tab]').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -1314,6 +1512,10 @@ function bindAuth() {
     showAlert('Sessão finalizada. Até logo!', 'success');
   });
 }
+
+// ===================================
+// === Bootstrap & Entry Point ===
+// ===================================
 
 (async function init() {
   bindAuth();

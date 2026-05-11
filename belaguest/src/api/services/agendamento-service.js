@@ -5,18 +5,36 @@ const servicoModel = require('../models/servico-model');
 const HttpError = require('./http-error');
 const { getIO } = require('../../config/socket');
 
+/**
+ * Converte string de tempo (HH:MM) para minutos
+ * @function timeToMinutes
+ * @param {string|number} value - Tempo em formato HH:MM ou HH:MM:SS
+ * @returns {number} Total de minutos desde meia-noite
+ */
 function timeToMinutes(value) {
   const [hour, minute] = String(value).split(':').map(Number);
   return (hour * 60) + minute;
 }
 
-function minutesToTime(value) {
+/**
+ * Converte minutos para string de tempo (HH:MM:SS)
+ * @function minutesToTime
+ * @param {number} value - Total de minutos desde meia-noite
+ * @returns {string} Tempo em formato HH:MM:SS
+ */
   const hours = String(Math.floor(value / 60)).padStart(2, '0');
   const minutes = String(value % 60).padStart(2, '0');
   return `${hours}:${minutes}:00`;
 }
 
-function buildSlotsFromDisponibilidade(disponibilidades, dayOfWeek, intervaloMinutos) {
+/**
+ * Constrói slots de horários disponíveis a partir de disponibilidades
+ * @function buildSlotsFromDisponibilidade
+ * @param {Array} disponibilidades - Array de disponívelidades com horários
+ * @param {number} dayOfWeek - Dia da semana (0-6)
+ * @param {number} intervaloMinutos - Intervalo entre slots
+ * @returns {Array<string>} Array de horários disponíveis ordenados
+ */
   const slots = [];
   const seen = new Set();
 
@@ -40,16 +58,37 @@ function buildSlotsFromDisponibilidade(disponibilidades, dayOfWeek, intervaloMin
   return slots.sort();
 }
 
-function getDayFromDate(dateString) {
+/**
+ * Obtém o dia da semana a partir de string de data
+ * @function getDayFromDate
+ * @param {string} dateString - Data em formato YYYY-MM-DD
+ * @returns {number} Dia da semana (0 = domingo, 6 = sábado)
+ */
   const day = new Date(`${dateString}T00:00:00`).getDay();
   return day;
 }
 
-function isBetweenTime(target, start, end) {
+/**
+ * Valida se um tempo está entre um intervalo
+ * @function isBetweenTime
+ * @param {string} target - Horário alvo (HH:MM:SS)
+ * @param {string} start - Horário de início (HH:MM:SS)
+ * @param {string} end - Horário de fim (HH:MM:SS)
+ * @returns {boolean} Verdadeiro se target está entre start e end
+ */
   return target >= start && target < end;
 }
 
-async function validarDisponibilidadeProfissional(idProfissional, data, horario) {
+/**
+ * Valida disponibuidade de um profissional para um horário específíco
+ * @async
+ * @function validarDisponibilidadeProfissional
+ * @param {number} idProfissional - ID do profissional
+ * @param {string} data - Data em formato YYYY-MM-DD
+ * @param {string} horario - Horário em formato HH:MM ou HH:MM:SS
+ * @returns {Promise<boolean>} Verdadeiro se disponível
+ * @throws {Error} Se houver erro na consulta
+ */
   const profissional = await profissionalModel.findProfissionalById(idProfissional);
   const disponibilidade = await profissionalModel.listDisponibilidade(idProfissional);
   if (!disponibilidade.length) {
@@ -61,7 +100,17 @@ async function validarDisponibilidadeProfissional(idProfissional, data, horario)
   return slots.includes(String(horario).length === 5 ? `${horario}:00` : horario);
 }
 
-async function escolherProfissionalDisponivel({ data, horario, idServico }) {
+/**
+ * Escolhe um profissional disponível para agendamento
+ * @async
+ * @function escolherProfissionalDisponivel
+ * @param {Object} params - Parâmetros
+ * @param {string} params.data - Data em formato YYYY-MM-DD
+ * @param {string} params.horario - Horário em formato HH:MM:SS
+ * @param {number} params.idServico - ID do serviço
+ * @returns {Promise<Object|null>} Profissional disponível ou null
+ * @throws {Error} Se houver erro na consulta
+ */
   const candidatos = await profissionalModel.listProfissionaisDisponiveis({ data, horario, idServico });
 
   for (const profissional of candidatos) {
@@ -74,7 +123,15 @@ async function escolherProfissionalDisponivel({ data, horario, idServico }) {
   return null;
 }
 
-async function resolverClienteId(user) {
+/**
+ * Resolve o ID do cliente a partir do usuário autenticado
+ * @async
+ * @function resolverClienteId
+ * @param {Object} user - Usuário autenticado
+ * @returns {Promise<number>} ID do cliente
+ * @throws {Error} 403 - Se usuário não for cliente
+ * @throws {Error} 404 - Se cliente não for encontrado
+ */
   if (user.tipoUsuario !== 'CLIENTE') {
     throw new HttpError('Apenas clientes podem criar reservas diretas.', 403);
   }
@@ -87,7 +144,15 @@ async function resolverClienteId(user) {
   return cliente.id;
 }
 
-async function resolverProfissionalId(user) {
+/**
+ * Resolve o ID do profissional a partir do usuário autenticado
+ * @async
+ * @function resolverProfissionalId
+ * @param {Object} user - Usuário autenticado
+ * @returns {Promise<number>} ID do profissional
+ * @throws {Error} 403 - Se usuário não for funcionário
+ * @throws {Error} 404 - Se profissional não for vinculado
+ */
   if (user.tipoUsuario !== 'FUNCIONARIO') {
     throw new HttpError('Apenas funcionários podem usar este fluxo.', 403);
   }
@@ -100,7 +165,22 @@ async function resolverProfissionalId(user) {
   return profissional.id;
 }
 
-async function create(payload, user) {
+/**
+ * Cria um novo agendamento
+ * @async
+ * @function create
+ * @param {Object} payload - Dados do agendamento
+ * @param {string} payload.data - Data em formato YYYY-MM-DD
+ * @param {string} payload.horario - Horário em formato HH:MM:SS
+ * @param {number} payload.idServico - ID do serviço
+ * @param {number} [payload.idProfissional] - ID do profissional (opcional, "ANY" para auto-seleção)
+ * @param {Object} user - Usuário autenticado (deve ser CLIENTE)
+ * @returns {Promise<Object>} Agendamento criado
+ * @throws {Error} 403 - Acesso negado
+ * @throws {Error} 404 - Recurso não encontrado
+ * @throws {Error} 409 - Conflito de agendamento
+ * @throws {Error} 400 - Dados inválidos
+ */
   const idCliente = await resolverClienteId(user);
 
   const servico = await servicoModel.findServicoById(payload.idServico);
@@ -165,7 +245,16 @@ async function create(payload, user) {
   return agendamento;
 }
 
-async function list(filters, user) {
+/**
+ * Lista agendamentos com filtros
+ * @async
+ * @function list
+ * @param {Object} filters - Filtros de busca (data, status, idCliente, idProfissional, etc)
+ * @param {Object} user - Usuário autenticado
+ * @returns {Promise<Array>} Array de agendamentos
+ * @throws {Error} 403 - Acesso negado
+ * @throws {Error} 404 - Perfil não encontrado
+ */
   const normalized = { ...filters };
 
   if (user.tipoUsuario === 'CLIENTE') {
@@ -179,7 +268,18 @@ async function list(filters, user) {
   return agendamentoModel.listAgendamentos(normalized);
 }
 
-async function update(id, payload, user) {
+/**
+ * Atualiza um agendamento existente
+ * @async
+ * @function update
+ * @param {number} id - ID do agendamento
+ * @param {Object} payload - Dados a atualizar
+ * @param {Object} user - Usuário autenticado
+ * @returns {Promise<Object>} Agendamento atualizado
+ * @throws {Error} 404 - Agendamento não encontrado
+ * @throws {Error} 403 - Acesso negado
+ * @throws {Error} 409 - Conflito de horário
+ */
   const existing = await agendamentoModel.findAgendamentoById(id);
   if (!existing) {
     throw new HttpError('Agendamento não encontrado.', 404);
@@ -219,7 +319,16 @@ async function update(id, payload, user) {
   return updated;
 }
 
-async function cancel(id, user) {
+/**
+ * Cancela um agendamento
+ * @async
+ * @function cancel
+ * @param {number} id - ID do agendamento
+ * @param {Object} user - Usuário autenticado
+ * @returns {Promise<Object>} Agendamento cancelado
+ * @throws {Error} 404 - Agendamento não encontrado
+ * @throws {Error} 403 - Acesso negado
+ */
   const existing = await agendamentoModel.findAgendamentoById(id);
   if (!existing) {
     throw new HttpError('Agendamento não encontrado.', 404);
@@ -251,7 +360,15 @@ async function cancel(id, user) {
   return updated;
 }
 
-async function addObservacao(id, observacao) {
+/**
+ * Adiciona uma observação a um agendamento
+ * @async
+ * @function addObservacao
+ * @param {number} id - ID do agendamento
+ * @param {string} observacao - Texto da observação
+ * @returns {Promise<Object>} Observação adicionada
+ * @throws {Error} 404 - Agendamento não encontrado
+ */
   const existing = await agendamentoModel.findAgendamentoById(id);
   if (!existing) {
     throw new HttpError('Agendamento não encontrado.', 404);
@@ -260,7 +377,17 @@ async function addObservacao(id, observacao) {
   return agendamentoModel.addObservacao({ idAgendamento: id, observacao });
 }
 
-async function addObservacaoComUsuario(id, observacao, user) {
+/**
+ * Adiciona observação com validação de usuário
+ * @async
+ * @function addObservacaoComUsuario
+ * @param {number} id - ID do agendamento
+ * @param {string} observacao - Texto da observação
+ * @param {Object} user - Usuário autenticado
+ * @returns {Promise<Object>} Observação adicionada
+ * @throws {Error} 404 - Agendamento não encontrado
+ * @throws {Error} 403 - Acesso negado
+ */
   const existing = await agendamentoModel.findAgendamentoById(id);
   if (!existing) {
     throw new HttpError('Agendamento não encontrado.', 404);
@@ -276,7 +403,15 @@ async function addObservacaoComUsuario(id, observacao, user) {
   return agendamentoModel.addObservacao({ idAgendamento: id, observacao });
 }
 
-async function sugestoes(data, idServico) {
+/**
+ * Retorna sugestões de horários disponíveis para uma data e serviço
+ * @async
+ * @function sugestoes
+ * @param {string} data - Data em formato YYYY-MM-DD
+ * @param {number} idServico - ID do serviço
+ * @returns {Promise<Object>} Sugestões com horários e profissionais
+ * @throws {Error} Se houver erro na consulta
+ */
   const profissionais = (await profissionalModel.listProfissionais()).filter((item) => item.status === 'ATIVO');
   const sugestoesDisponiveis = [];
 
@@ -316,7 +451,17 @@ async function sugestoes(data, idServico) {
   };
 }
 
-async function disponibilidadeDia({ data, idServico, idProfissional }) {
+/**
+ * Retorna disponibilidade de profissionais para um dia específíco
+ * @async
+ * @function disponibilidadeDia
+ * @param {Object} params - Parâmetros
+ * @param {string} params.data - Data em formato YYYY-MM-DD (obrigatório)
+ * @param {number} [params.idServico] - ID do serviço (opcional)
+ * @param {number} [params.idProfissional] - ID do profissional (opcional)
+ * @returns {Promise<Object>} Disponibilidade por profissional com slots de horários
+ * @throws {Error} 400 - Data obrigatória não fornecida
+ */
   if (!data) {
     throw new HttpError('A data é obrigatória para consulta de disponibilidade.', 400);
   }

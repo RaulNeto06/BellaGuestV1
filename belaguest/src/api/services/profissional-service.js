@@ -2,6 +2,15 @@ const HttpError = require('./http-error');
 const profissionalModel = require('../models/profissional-model');
 const userModel = require('../models/user-model');
 
+/**
+ * Valida vínculo de usuário ao profissional
+ * @async
+ * @function validarVinculoUsuario
+ * @param {number|null} idUsuario - ID do usuário para vincular
+ * @returns {Promise<number|null>} ID do usuário validado ou null
+ * @throws {Error} 404 - Usuário não encontrado
+ * @throws {Error} 400 - Usuário não é do tipo FUNCIONARIO
+ */
 async function validarVinculoUsuario(idUsuario) {
   if (!idUsuario) {
     return null;
@@ -19,7 +28,22 @@ async function validarVinculoUsuario(idUsuario) {
   return idUsuario;
 }
 
-async function create(payload) {
+/**
+ * Cria um novo profissional
+ * @async
+ * @function create
+ * @param {Object} payload - Dados do profissional
+ * @param {string} payload.nome - Nome do profissional
+ * @param {string} payload.telefone - Telefone do profissional
+ * @param {number} [payload.intervaloMinutos=60] - Intervalo entre agendamentos
+ * @param {string} [payload.status=ATIVO] - Status do profissional
+ * @param {number} [payload.idUsuario] - ID do usuário a vincular
+ * @param {Array<number>} [payload.idsServicos] - IDs dos serviços oferecidos
+ * @param {Array<Object>} [payload.disponibilidades] - Disponívelidades de horário
+ * @returns {Promise<Object>} Profissional criado com detalhe completo
+ * @throws {Error} 404 - Usuário não encontrado
+ * @throws {Error} 400 - Dados inválidos
+ */
   const idUsuario = await validarVinculoUsuario(payload.idUsuario);
 
   const profissional = await profissionalModel.createProfissional({
@@ -41,11 +65,24 @@ async function create(payload) {
   return detail(profissional.id);
 }
 
-async function list() {
+/**
+ * Lista todos os profissionais
+ * @async
+ * @function list
+ * @returns {Promise<Array>} Array de todos os profissionais
+ * @throws {Error} Se houver erro na consulta
+ */
   return profissionalModel.listProfissionais();
 }
 
-async function detail(id) {
+/**
+ * Retorna detalhes completos de um profissional
+ * @async
+ * @function detail
+ * @param {number} id - ID do profissional
+ * @returns {Promise<Object>} Profissional com lista de serviços e disponibilidades
+ * @throws {Error} 404 - Profissional não encontrado
+ */
   const profissional = await profissionalModel.findProfissionalById(id);
   if (!profissional) {
     throw new HttpError('Profissional não encontrado.', 404);
@@ -63,7 +100,14 @@ async function detail(id) {
   };
 }
 
-async function detailByUserId(idUsuario) {
+/**
+ * Retorna detalhes de um profissional por ID de usuário
+ * @async
+ * @function detailByUserId
+ * @param {number} idUsuario - ID do usuário
+ * @returns {Promise<Object>} Profissional com serviços e disponibilidades
+ * @throws {Error} 404 - Perfil profissional não encontrado para o usuário
+ */
   const profissional = await profissionalModel.findProfissionalByUserId(idUsuario);
   if (!profissional) {
     throw new HttpError('Não há perfil profissional vinculado para este usuário.', 404);
@@ -72,7 +116,23 @@ async function detailByUserId(idUsuario) {
   return detail(profissional.id);
 }
 
-async function update(id, payload) {
+/**
+ * Atualiza um profissional existente
+ * @async
+ * @function update
+ * @param {number} id - ID do profissional
+ * @param {Object} payload - Dados a atualizar
+ * @param {string} [payload.nome] - Nome do profissional
+ * @param {string} [payload.telefone] - Telefone do profissional
+ * @param {number} [payload.intervaloMinutos] - Intervalo entre agendamentos
+ * @param {string} [payload.status] - Status do profissional
+ * @param {number} [payload.idUsuario] - ID do usuário a vincular
+ * @param {Array<number>} [payload.idsServicos] - IDs dos serviços a atualizar
+ * @param {Array<Object>} [payload.disponibilidades] - Disponívelidades a atualizar
+ * @returns {Promise<Object>} Profissional atualizado
+ * @throws {Error} 404 - Profissional não encontrado
+ * @throws {Error} 400 - Dados inválidos
+ */
   const existing = await profissionalModel.findProfissionalById(id);
   if (!existing) {
     throw new HttpError('Profissional não encontrado.', 404);
@@ -101,7 +161,14 @@ async function update(id, payload) {
   return detail(id);
 }
 
-async function remove(id) {
+/**
+ * Remove um profissional existente
+ * @async
+ * @function remove
+ * @param {number} id - ID do profissional
+ * @returns {Promise<Object>} Mensagem de sucesso
+ * @throws {Error} 404 - Profissional não encontrado
+ */
   const deleted = await profissionalModel.deleteProfissional(id);
   if (!deleted) {
     throw new HttpError('Profissional não encontrado.', 404);
@@ -110,7 +177,17 @@ async function remove(id) {
   return { message: 'Profissional removido com sucesso.' };
 }
 
-async function updateAvailabilityByUserId(idUsuario, payload) {
+/**
+ * Atualiza a disponibilidade de um profissional pelo seu ID de usuário
+ * @async
+ * @function updateAvailabilityByUserId
+ * @param {number} idUsuario - ID do usuário
+ * @param {Object} payload - Dados de disponibilidade
+ * @param {number} [payload.intervaloMinutos] - Intervalo entre agendamentos
+ * @param {Array<Object>} payload.disponibilidades - Novas disponibilidades
+ * @returns {Promise<Object>} Profissional com disponibilidades atualizadas
+ * @throws {Error} 404 - Perfil profissional não encontrado
+ */
   const profissional = await profissionalModel.findProfissionalByUserId(idUsuario);
   if (!profissional) {
     throw new HttpError('Não há perfil profissional vinculado para este usuário.', 404);
@@ -129,7 +206,15 @@ async function updateAvailabilityByUserId(idUsuario, payload) {
   return detail(profissional.id);
 }
 
-async function updateServicosByUserId(idUsuario, idsServicos) {
+/**
+ * Atualiza os serviços de um profissional pelo seu ID de usuário
+ * @async
+ * @function updateServicosByUserId
+ * @param {number} idUsuario - ID do usuário
+ * @param {Array<number>} idsServicos - IDs dos serviços a atualizar
+ * @returns {Promise<Object>} Profissional com serviços atualizados
+ * @throws {Error} 404 - Perfil profissional não encontrado
+ */
   const profissional = await profissionalModel.findProfissionalByUserId(idUsuario);
   if (!profissional) {
     throw new HttpError('Não há perfil profissional vinculado para este usuário.', 404);

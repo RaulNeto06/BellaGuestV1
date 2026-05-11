@@ -1,343 +1,394 @@
 # BelaGuest API
 
-Sistema profissional de agendamento para salão de beleza com arquitetura MVC, Node.js + Express, MySQL e Docker, preparado para evolução para API REST pública.
+Sistema profissional de agendamento para salão de beleza com arquitetura MVC completa. Desenvolvido com Node.js, Express, MySQL e Socket.io, pronto para deploy em produção.
 
-## 📋 Arquitetura do Projeto
+## Overview
 
-```text
+BelaGuest é uma aplicação web para gerenciamento de agendamentos em salões de beleza, permitindo que clientes agendem serviços, profissionais gerenciem sua disponibilidade e administradores controlem toda a operação.
+
+### Funcionalidades Principais
+- Autenticação segura com JWT
+- Cadastro e gerenciamento de serviços
+- Agendamento de clientes com verificação de disponibilidade
+- Dashboard com resumo diário
+- Sistema de notificações em tempo real via WebSocket
+- Interface web responsiva
+- Controle de acesso baseado em papéis (RBAC)
+
+## Stack Tecnológico
+
+### Backend
+- Node.js 24+ (LTS)
+- Express.js 4.21.0
+- MySQL 8.0
+- JWT (jsonwebtoken)
+- Socket.io para real-time
+- bcryptjs para password hashing
+- express-validator para validações
+
+### Frontend
+- HTML5 semântico
+- CSS3 modularizado
+- JavaScript ES6+
+- responsive design (mobile-first)
+
+### Infrastructure
+- Docker para containerização
+- Docker Compose para orquestração
+- Port 3000
+
+## Estrutura do Projeto
+
+```
 belaguest/
 ├── src/
 │   ├── api/
-│   │   ├── controllers/          # Recebem requisições
-│   │   ├── models/               # Acesso ao banco de dados
-│   │   ├── services/             # Lógica de negócio
-│   │   ├── routes/               # Definição de rotas
-│   │   ├── validators/           # Validação de requisições
-│   │   └── index.js              # Exporta módulos
+│   │   ├── controllers/         # Controladores HTTP
+│   │   ├── models/              # Acesso ao banco de dados
+│   │   ├── services/            # Lógica de negócio
+│   │   ├── routes/              # Definição de endpoints
+│   │   └── validators/          # Express-validator rules
 │   ├── config/
-│   │   ├── database.js           # Conexão MySQL
-│   │   ├── env.js                # Variáveis de ambiente
-│   │   ├── socket.js             # WebSocket (Socket.io)
-│   │   └── index.js              # Exporta módulos
+│   │   ├── database.js          # Pool de conexões MySQL
+│   │   ├── env.js               # Variáveis de ambiente
+│   │   └── socket.js            # Configuração WebSocket
 │   ├── middlewares/
-│   │   ├── auth-middleware.js    # Autenticação JWT
-│   │   ├── role-middleware.js    # Autorização por perfil
-│   │   ├── error-handler.js      # Tratamento de erros
-│   │   ├── validate-request.js   # Validação de requisições
-│   │   └── index.js              # Exporta módulos
-│   ├── app.js                    # Configuração Express
-│   └── server.js                 # Inicialização do servidor
-│
+│   │   ├── auth-middleware.js   # Autenticação JWT
+│   │   ├── role-middleware.js   # Autorização RBAC
+│   │   ├── error-handler.js     # Tratamento de erros
+│   │   └── validate-request.js  # Execução de validações
+│   ├── app.js                   # Configuração Express
+│   └── server.js                # Inicialização do servidor
 ├── infra/
-│   ├── Dockerfile                # Imagem Docker
-│   ├── docker-compose.yml        # Orquestração de containers
-│   └── .dockerignore             # Arquivos ignorados no build
-│
+│   ├── Dockerfile               # Imagem Docker
+│   └── docker-compose.yml       # Orquestração
 ├── database/
-│   └── init.sql                  # Script de inicialização do banco
-│
-├── docs/
-│   ├── getting-started.md        # Guia de inicialização
-│   ├── services-system.md        # Sistema de serviços
-│   └── test-users.md             # Usuários de teste
-│
-├── public/                       # Arquivos estáticos (frontend)
-├── package.json                  # Dependências do projeto
-├── .env.example                  # Variáveis de ambiente exemplo
-└── README.md                     # Este arquivo
+│   └── init.sql                 # Schema + dados iniciais
+├── public/                      # Arquivos estáticos
+│   ├── index.html
+│   ├── app.css
+│   └── app.js
+├── .env.example                 # Template de variáveis
+├── .gitignore
+├── package.json
+└── README.md
 ```
 
-## 🏗️ Arquitetura de Camadas
+## Arquitetura de Camadas
 
-### Princípios Aplicados
-- **Controllers**: Apenas recebem requisições HTTP e delegam para Services
-- **Services**: Concentram toda a lógica de negócio da aplicação
-- **Models**: Isolam o acesso direto ao banco de dados
-- **Routes**: Definem endpoints sem conter regra de negócio
-- **Middlewares**: Prototipam autenticação, autorização e validação
+### MVC Pattern
 
-### Padrões de Nomenclatura
-- **Arquivos**: kebab-case (`auth-middleware.js`, `servico-service.js`)
-- **Classes/Exports**: PascalCase quando aplicável
-- **Funções**: camelCase
-- **Pastas**: lowercase
+- **Models**: Isolam acesso ao banco de dados via SQL queries
+- **Services**: Contêm toda a lógica de negócio da aplicação
+- **Controllers**: Recebem requisições HTTP e orquestram respostas
+- **Routes**: Definem endpoints sem conter lógica
+- **Middlewares**: Autenticação, autorização, validação e tratamento de erros
 
-## 🔧 Configuração do Projeto
+## Instalação Local
 
-### Variáveis de Ambiente
+### Pré-requisitos
+- Node.js 24+
+- MySQL 8.0+
+- Docker (opcional, recomendado)
 
-Use o arquivo `.env.example` como base. Crie um arquivo `.env` na raiz:
+### Setup
 
-```env
-# Database
-DB_HOST=mysql
-DB_USER=belaguest_user
-DB_PASSWORD=belaguest_pass
-DB_NAME=belaguest
-
-# Server
-PORT=3000
-NODE_ENV=development
-
-# JWT
-JWT_SECRET=super_secret_change_me
-JWT_EXPIRES_IN=1d
-
-# Logging
-LOG_LEVEL=debug
-CORS_ORIGIN=*
-```
-
-> **⚠️ IMPORTANTE**: Nunca comita o arquivo `.env` com dados reais no repositório!
-
-## 🚀 Como Executar
-
-### Docker Compose (Recomendado para Produção)
-
+1. Clone o repositório:
 ```bash
-cd belaguest
-
-# Iniciar os containers (API + MySQL)
-docker-compose -f infra/docker-compose.yml up -d
-
-# Para verificar logs
-docker-compose -f infra/docker-compose.yml logs -f
-
-# Para parar
-docker-compose -f infra/docker-compose.yml down
+git clone https://github.com/RaulNeto06/BellaGuestV1.git
+cd BellaGuestV1/belaguest
 ```
 
-**API disponível em**: `http://localhost:3000`
-
-### Instalação Manual com Node.js
-
+2. Instale dependências:
 ```bash
-cd belaguest
-
-# Instalar dependências
 npm install
+```
 
-# Iniciar servidor
+3. Configure variáveis de ambiente:
+```bash
+cp .env.example .env
+# Edite .env com suas credenciais
+```
+
+4. Inicie o servidor:
+```bash
 npm start
 ```
 
-**Requer MySQL 8.0+ instalado e rodando localmente**
+API estará disponível em `http://localhost:3000`
 
-## 📚 Banco de Dados
+## Executar com Docker
 
-O script `database/init.sql` cria automaticamente:
+Recomendado para produção:
 
-### Tabelas Principais
-- **Usuario**: Usuários da aplicação
-- **Cliente**: Perfil de cliente
-- **Administrador**: Perfil de administrador
-- **Profissional**: Profissionais (funcionários)
-- **Servico**: Serviços oferecidos
-- **Agendamento**: Agendamentos de clientes
-- **ProfissionalServico**: Vinculação profissional ↔ serviço
-- **DisponibilidadeProfissional**: Horários de disponibilidade
-- **AgendamentoObservacao**: Observações em agendamentos
+```bash
+cd belaguest
 
-### Usuários Pré-configurados
+# Iniciar containers
+docker-compose -f infra/docker-compose.yml up -d
 
-| Email | Senha | Tipo | Permissões |
-|-------|-------|------|------------|
-| `admin@belaguest.com` | `123456` | ADMINISTRADOR | Acesso total |
-| `funcionaria@belaguest.com` | `123456` | FUNCIONARIO | Gerenciar disponibilidade e agendamentos |
-| `cliente@belaguest.com` | `123456` | CLIENTE | Agendar serviços |
+# Verificar logs
+docker-compose -f infra/docker-compose.yml logs -f
 
-## 🔌 Endpoints Principais (`/api/v1`)
-
-### Autenticação
-```
-POST   /auth/register        # Registrar novo cliente
-POST   /auth/login           # Fazer login
-GET    /auth/me              # Obter dados do usuário (JWT)
+# Parar containers
+docker-compose -f infra/docker-compose.yml down
 ```
 
-### Serviços
-```
-GET    /servicos             # Listar todos os serviços
-POST   /servicos             # Criar serviço (ADMIN)
-PUT    /servicos/:id         # Atualizar serviço (ADMIN)
-DELETE /servicos/:id         # Deletar serviço (ADMIN)
-```
+API estará disponível em `http://localhost:3000`
+
+## Banco de Dados
+
+O arquivo `database/init.sql` cria automaticamente:
+
+### Tabelas
+- Usuario: usuários do sistema
+- Profissional: prestadores de serviço
+- Servico: serviços oferecidos
+- Agendamento: agendamentos de clientes
+- ProfissionalServico: relacionamento profissional-serviço
+- DisponibilidadeProfissional: horários disponíveis
+- AgendamentoObservacao: anotações
+
+### Usuários Padrão
+
+| Email | Senha | Papel |
+|-------|-------|-------|
+| admin@belaguest.com | 123456 | ADMINISTRADOR |
+| profissional@belaguest.com | 123456 | PROFISSIONAL |
+| cliente@belaguest.com | 123456 | CLIENTE |
+
+## API Endpoints
+
+Todos os endpoints requerem autenticação JWT (exceto login/register).
+
+### Auth
+- `POST /api/v1/auth/register` - Registrar novo cliente
+- `POST /api/v1/auth/login` - Fazer login
+- `GET /api/v1/auth/me` - Dados do usuário autenticado
+
+### Servicos
+- `GET /api/v1/servicos` - Listar serviços
+- `POST /api/v1/servicos` - Criar serviço (admin)
+- `PUT /api/v1/servicos/:id` - Atualizar serviço (admin)
+- `DELETE /api/v1/servicos/:id` - Deletar serviço (admin)
 
 ### Profissionais
-```
-GET    /profissionais                      # Listar profissionais
-GET    /profissionais/me                   # Meus dados (FUNCIONARIO)
-GET    /profissionais/me/servicos          # Meus serviços (FUNCIONARIO)
-PATCH  /profissionais/me/servicos          # Atualizar meus serviços (FUNCIONARIO)
-GET    /profissionais/:id                  # Detalhes do profissional
-POST   /profissionais                      # Criar profissional (ADMIN)
-PUT    /profissionais/:id                  # Atualizar profissional (ADMIN)
-DELETE /profissionais/:id                  # Deletar profissional (ADMIN)
-```
+- `GET /api/v1/profissionais` - Listar profissionais
+- `GET /api/v1/profissionais/:id` - Detalhes do profissional
+- `GET /api/v1/profissionais/me` - Dados do profissional logado
+- `POST /api/v1/profissionais` - Criar profissional (admin)
+- `PUT /api/v1/profissionais/:id` - Atualizar profissional (admin)
+- `DELETE /api/v1/profissionais/:id` - Deletar profissional (admin)
 
 ### Agendamentos
-```
-GET    /agendamentos                   # Listar agendamentos (filtrado por permissão)
-POST   /agendamentos                   # Criar agendamento (CLIENTE)
-PUT    /agendamentos/:id               # Atualizar agendamento
-DELETE /agendamentos/:id               # Cancelar agendamento
-GET    /agendamentos/sugestoes         # Obter sugestões de horários
-GET    /agendamentos/disponibilidade   # Verificar disponibilidade
-```
+- `GET /api/v1/agendamentos` - Listar agendamentos
+- `POST /api/v1/agendamentos` - Criar agendamento
+- `PUT /api/v1/agendamentos/:id` - Atualizar agendamento
+- `DELETE /api/v1/agendamentos/:id` - Cancelar agendamento
+- `GET /api/v1/agendamentos/disponibilidade` - Verificar disponibilidade
+- `GET /api/v1/agendamentos/sugestoes` - Obter sugestões de horários
 
 ### Dashboard
-```
-GET    /dashboard/resumo                # Resumo do dia (ADMIN/FUNCIONARIO)
-```
+- `GET /api/v1/dashboard/resumo` - Resumo do dia
 
-### Usuários
-```
-GET    /usuarios                        # Listar usuários (ADMIN)
-PUT    /usuarios/:id                    # Atualizar usuário (ADMIN)
-```
+### Health
+- `GET /health` - Status da API e banco de dados
 
-### Health Check
-```
-GET    /health                          # Status da API e banco de dados
-```
+## Autenticação
 
-## 📖 Documentação Completa
+Usa JWT (JSON Web Tokens) com Bearer token.
 
-Para informações detalhadas sobre endpoints, exemplos de requisições e autenticação, consulte a seção **Endpoints Principais** abaixo.
-
-## 🛠️ Scripts NPM
-
+### Exemplo: Login
 ```bash
-npm start            # Iniciar servidor em produção
-npm install          # Instalar dependências
-```
-
-## 🔐 Autenticação
-
-A aplicação usa **JWT (JSON Web Tokens)** para autenticação:
-
-```bash
-# 1. Fazer login
 curl -X POST http://localhost:3000/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "cliente@belaguest.com",
     "senha": "123456"
   }'
+```
 
-# Resposta contém o token
+Resposta:
+```json
 {
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "usuario": { "id": 1, "nome": "...", "email": "...", "tipoUsuario": "CLIENTE" }
+  "usuario": {
+    "id": 1,
+    "nome": "Cliente",
+    "email": "cliente@belaguest.com",
+    "tipoUsuario": "CLIENTE"
+  }
 }
+```
 
-# 2. Usar o token em requisições subsequentes
+### Usar Token
+```bash
 curl -X GET http://localhost:3000/api/v1/auth/me \
-  -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+  -H "Authorization: Bearer SEU_TOKEN_AQUI"
 ```
 
-## 🧪 Testing
+## Variáveis de Ambiente
 
-Recomendamos usar **Postman** ou **Insomnia** para testar a API.
+Crie um arquivo `.env` baseado em `.env.example`:
 
-## 🐛 Troubleshooting
+```env
+# Database
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=senha_segura
+DB_NAME=belaguest
 
-### Porta 3000 já está em uso
-```bash
-lsof -i :3000          # Identificar processo
-kill -9 <PID>          # Matar processo
+# Server
+PORT=3000
+NODE_ENV=production
+
+# JWT
+JWT_SECRET=sua_chave_secreta_bem_segura
+JWT_EXPIRES_IN=1d
+
+# CORS
+CORS_ORIGIN=https://seu-dominio.com
 ```
 
-### Banco de dados não conecta com Docker
-```bash
-# Verifique se os containers estão rodando
-docker ps
+**Segurança**: Nunca commite o arquivo `.env` com dados reais.
 
-# Reinicie os containers
-docker-compose -f infra/docker-compose.yml down
+## Desenvolvimento
+
+### Em Modo Dev (with auto-reload)
+```bash
+npm run dev
+```
+
+Usa nodemon para auto-reload em mudanças.
+
+### Testes
+
+Faltam testes. Para implementar:
+```bash
+npm install --save-dev jest supertest
+```
+
+## Scripts NPM
+
+```bash
+npm start          # Iniciar servidor (produção)
+npm run dev        # Iniciar com nodemon (desenvolvimento)
+npm install        # Instalar dependências
+```
+
+## Troubleshooting
+
+### Porta 3000 já em uso
+```bash
+lsof -i :3000
+kill -9 <PID>
+```
+
+### Conexão com banco recusada
+Verifique se MySQL está rodando e credenciais estão corretas em `.env`.
+
+Com Docker:
+```bash
+docker-compose -f infra/docker-compose.yml restart mysql
+```
+
+### Resetar banco de dados
+```bash
+docker-compose -f infra/docker-compose.yml down -v
 docker-compose -f infra/docker-compose.yml up -d
 ```
 
-## 📝 Logs
+## Padrões de Código
 
-### Com Docker
+### Nomenclatura
+- Pastas: lowercase (api/, config/)
+- Arquivos: kebab-case (auth-controller.js)
+- Variáveis/funções: camelCase (getUserById)
+- Classes: PascalCase (UserService)
+
+### ES6+
+- Use const/let (não var)
+- Arrow functions
+- Template literals
+- Destructuring
+- Async/await
+
+### Estrutura
+- Controllers: delegam para Services
+- Services: implementam lógica
+- Models: apenas queries SQL
+- Middlewares: reutilizáveis
+
+## Deployment
+
+### Docker (Recomendado)
+
 ```bash
-# Logs da API
-docker-compose -f infra/docker-compose.yml logs -f api
+# Build
+docker build -f infra/Dockerfile -t belaguest-api:latest .
 
-# Logs do MySQL
-docker-compose -f infra/docker-compose.yml logs -f mysql
-
-# Ambos
-docker-compose -f infra/docker-compose.yml logs -f
+# Run
+docker run -p 3000:3000 --env-file .env belaguest-api:latest
 ```
 
-### Verificar containers
+Com Docker Compose:
 ```bash
-docker ps
+docker-compose -f infra/docker-compose.yml up -d
 ```
 
-## 💡 Dicas
+### Considerações de Produção
+1. Use HTTPS (nginx com Let's Encrypt)
+2. Altere JWT_SECRET para valor seguro
+3. Use variáveis de ambiente reais (não .env)
+4. Implemente rate limiting
+5. Configure CORS para domínios conhecidos
+6. Monitore logs e performance
+7. Use reverse proxy (nginx)
+8. Implemente backups automáticos do DB
+9. Configure SSL/TLS
+10. Use processo manager (PM2)
 
-- Em desenvolvimento, a aplicação recarrega automaticamente (`npm run dev`)
-- Tokens JWT expiram em 1 dia (configurável em `.env`)
-- Para resetar dados do banco: `docker-compose -f infra/docker-compose.yml down -v`
-- Sempre use HTTPS em produção
-- Altere `JWT_SECRET` antes de ir para produção
+## Dependências de Produção
 
-## 📧 Contato e Suporte
+| Pacote | Versão | Uso |
+|--------|--------|-----|
+| express | 4.21.0 | Framework web |
+| mysql2 | 3.11.3 | Driver MySQL |
+| jsonwebtoken | 9.0.2 | JWT authentication |
+| bcryptjs | 2.4.3 | Password hashing |
+| express-validator | 7.2.0 | Validações |
+| socket.io | 4.8.1 | WebSocket real-time |
+| cors | 2.8.5 | CORS handling |
+| morgan | 1.10.0 | HTTP logging |
+| dotenv | 16.4.5 | Variáveis de ambiente |
 
-- **Desenvolvedor**: RaulNeto06
-- **Repositório**: https://github.com/RaulNeto06/BellaGuestV1
-- **Issues**: https://github.com/RaulNeto06/BellaGuestV1/issues
+## Débitos Técnicos
 
-## 📄 Licença
+Implementações futuras recomendadas:
+- Testes unitários (Jest)
+- Testes de integração
+- Rate limiting
+- Sanitização adicional de inputs
+- Logging estruturado
+- Database transactions
+- API documentation (Swagger/OpenAPI)
+- Caching (Redis)
+- Monitoramento (APM)
+- Paginação em endpoints listar
+
+## Contribuindo
+
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## Licença
 
 ISC
-- `POST /profissionais` (ADMIN)
-- `PUT /profissionais/:id` (ADMIN)
-- `DELETE /profissionais/:id` (ADMIN)
 
-### Agendamentos
-- `GET /agendamentos`
-- `GET /agendamentos/sugestoes?data=YYYY-MM-DD&idServico=1`
-- `GET /agendamentos/disponibilidade?data=YYYY-MM-DD&idServico=1&idProfissional=2`
-- `POST /agendamentos` (CLIENTE)
-- `PUT /agendamentos/:id` (ADMIN/FUNCIONARIO/CLIENTE com regra de acesso)
-- `PATCH /agendamentos/:id/cancelar`
-- `POST /agendamentos/:id/observacoes` (ADMIN/FUNCIONARIO)
+## Contato
 
-### Dashboard
-- `GET /dashboard/resumo` (ADMIN)
-
-## Regras de negócio de agendamento
-- Bloqueio de conflito: não permite dois agendamentos no mesmo horário para o mesmo profissional.
-- Opção “qualquer profissional disponível”: alocação automática de profissional livre e apto ao serviço.
-- Validação de disponibilidade por dia da semana e faixa de horário.
-- Cada agendamento ocupa o slot completo.
-- Emissão de eventos em tempo real via `socket.io`:
-  - `agendamento:created`
-  - `agendamento:updated`
-  - `agendamento:cancelled`
-
-## UX e evolução de produto
-Base pronta para evolução com front-end responsivo (desktop/mobile) com:
-- calendário mensal interativo;
-- status visual de horários (livre/ocupado/bloqueado);
-- filtros por profissional/serviço;
-- alertas em tempo real;
-- sugestões inteligentes de horários para clientes.
-
-## Interface web já implementada
-- Login e cadastro na mesma tela.
-- Área de cliente: calendário mensal, filtro por profissional/serviço, reserva de horários e aba de meus agendamentos.
-- Área de funcionário: perfil, visão de calendário e agendamentos do dia com marcação de presença/cancelamento/observações, sempre vinculados ao próprio profissional.
-- Área de administrador: dashboard, CRUD de profissionais e serviços, visão geral de reservas e calendário operacional.
-
-## Vínculo funcionário-profissional
-- O profissional pode ser vinculado a um usuário funcionário pelo campo `idUsuario` no cadastro de profissional.
-- Após vínculo, o funcionário passa a operar apenas a própria agenda (visualização e ações).
-
-## Observações
-- O projeto já está preparado para deploy futuro em ambientes externos com configuração por variáveis de ambiente.
-- A camada de API está organizada para futura abertura pública com versionamento (`/api/v1`).
+- GitHub: https://github.com/RaulNeto06/BellaGuestV1
+- Issues: https://github.com/RaulNeto06/BellaGuestV1/issues

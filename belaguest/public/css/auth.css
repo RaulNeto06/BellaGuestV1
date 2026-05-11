@@ -1,0 +1,125 @@
+/* ========================================
+   Authentication Section
+======================================== */
+
+/* Auth Card */
+.auth-card {
+  background: var(--white);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-xl), var(--shadow-pink);
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 440px;
+  border: 1px solid var(--pink-100);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--pink-400), var(--pink-600), var(--rose-gold));
+}
+
+/* Auth Header */
+.auth-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.logo {
+  width: 80px;
+  height: 80px;
+  background: linear-gradient(135deg, var(--pink-400), var(--pink-600));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  box-shadow: var(--shadow-pink);
+}
+
+.logo i {
+  font-size: 36px;
+  color: var(--white);
+}
+
+.auth-header h1 {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 600;
+  color: var(--pink-700);
+  margin-bottom: 8px;
+}
+
+.tagline {
+  color: var(--gray-500);
+  font-size: 14px;
+  font-weight: 300;
+}
+
+/* Auth Tabs */
+.auth-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+  background: var(--gray-100);
+  padding: 6px;
+  border-radius: var(--radius-full);
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--gray-600);
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.auth-tab:hover {
+  color: var(--pink-600);
+}
+
+.auth-tab.active {
+  background: var(--white);
+  color: var(--pink-600);
+  box-shadow: var(--shadow);
+}
+
+/* Auth Form */
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Auth Footer */
+.auth-footer {
+  text-align: center;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--gray-200);
+}
+
+.auth-footer p {
+  color: var(--gray-500);
+  font-size: 13px;
+}
+
+.auth-footer i {
+  color: var(--pink-500);
+}

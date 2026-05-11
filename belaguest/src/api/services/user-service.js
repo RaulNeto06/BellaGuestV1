@@ -4,15 +4,43 @@ const HttpError = require('./http-error');
 const userModel = require('../models/user-model');
 const clienteModel = require('../models/cliente-model');
 
+/**
+ * Normaliza um email (trim e lowercase)
+ * @function normalizeEmail
+ * @param {string} email - Email a normalizar
+ * @returns {string} Email normalizado
+ */
 function normalizeEmail(email) {
   return String(email || '').trim().toLowerCase();
 }
 
-async function listAdminUsers() {
+/**
+ * Lista todos os usuários administradores
+ * @async
+ * @function listAdminUsers
+ * @returns {Promise<Array>} Array de usuários administradores
+ * @throws {Error} Se houver erro na consulta
+ */
   return userModel.listUsersAdmin();
 }
 
-async function updateUserByAdmin(id, payload, actor) {
+/**
+ * Atualiza um usuário como administrador
+ * @async
+ * @function updateUserByAdmin
+ * @param {number} id - ID do usuário a atualizar
+ * @param {Object} payload - Dados a atualizar
+ * @param {string} [payload.nome] - Nome do usuário
+ * @param {string} [payload.email] - Email do usuário
+ * @param {string} [payload.tipoUsuario] - Tipo de usuário (CLIENTE, FUNCIONARIO, ADMINISTRADOR)
+ * @param {string} [payload.senha] - Senha do usuário
+ * @param {string} [payload.telefone] - Telefone (obrigatório para CLIENTE)
+ * @param {Object} actor - Administrador que realiza a atualização
+ * @returns {Promise<Object>} Usuário atualizado
+ * @throws {Error} 404 - Usuário não encontrado
+ * @throws {Error} 409 - Email já cadastrado
+ * @throws {Error} 400 - Dados inválidos ou operação não permitida
+ */
   const target = await userModel.findUserByIdWithPassword(id);
   if (!target) {
     throw new HttpError('Usuário não encontrado.', 404);

@@ -5,11 +5,30 @@ const HttpError = require('./http-error');
 const userModel = require('../models/user-model');
 const clienteModel = require('../models/cliente-model');
 
+/**
+ * Normaliza um email (trim e lowercase)
+ * @function normalizeEmail
+ * @param {string} email - Email a normalizar
+ * @returns {string} Email normalizado
+ */
 function normalizeEmail(email) {
   return String(email || '').trim().toLowerCase();
 }
 
-async function register({ nome, email, senha, tipoUsuario, telefone }) {
+/**
+ * Registra um novo usuário do tipo CLIENTE
+ * @async
+ * @function register
+ * @param {Object} params - Parâmetros de registro
+ * @param {string} params.nome - Nome completo do usuário
+ * @param {string} params.email - Email do usuário
+ * @param {string} params.senha - Senha do usuário (mínimo 6 caracteres)
+ * @param {string} [params.telefone] - Telefone do usuário
+ * @param {string} [params.tipoUsuario] - Tipo de usuário (sempre será CLIENTE)
+ * @returns {Promise<Object>} Dados do usuário criado
+ * @throws {Error} 403 - Apenas CLIENTEs podem se registrar publicamente
+ * @throws {Error} 409 - Email já cadastrado
+ */
   const normalizedEmail = normalizeEmail(email);
   const targetRole = tipoUsuario || 'CLIENTE';
 
@@ -35,7 +54,16 @@ async function register({ nome, email, senha, tipoUsuario, telefone }) {
   return newUser;
 }
 
-async function login({ email, senha }) {
+/**
+ * Autentica um usuário com email e senha
+ * @async
+ * @function login
+ * @param {Object} credentials - Credenciais de login
+ * @param {string} credentials.email - Email do usuário
+ * @param {string} credentials.senha - Senha do usuário
+ * @returns {Promise<Object>} Token JWT e dados do usuário
+ * @throws {Error} 401 - Credenciais inválidas
+ */
   const normalizedEmail = normalizeEmail(email);
   const user = await userModel.findUserByEmail(normalizedEmail);
   if (!user) {
@@ -68,7 +96,14 @@ async function login({ email, senha }) {
   };
 }
 
-async function me(userId) {
+/**
+ * Retorna os dados do usuário autenticado
+ * @async
+ * @function me
+ * @param {number} userId - ID do usuário
+ * @returns {Promise<Object>} Dados do usuário
+ * @throws {Error} 404 - Usuário não encontrado
+ */
   const user = await userModel.findUserById(userId);
   if (!user) {
     throw new HttpError('Usuário não encontrado.', 404);

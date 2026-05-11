@@ -1,126 +1,206 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BelaGuest | Salão de Beleza</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="/app.css" />
-  </head>
-  <body>
-    <div class="bg-pattern"></div>
-    <div class="floating-shapes">
-      <div class="shape shape-1"></div>
-      <div class="shape shape-2"></div>
-      <div class="shape shape-3"></div>
-    </div>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="BelaGuest - Sistema completo de agendamento para salões de beleza. Agendamentos online, gestão de profissionais e dashboard em tempo real.">
+  <meta name="keywords" content="salão de beleza, agendamento, beleza, estética">
+  <meta name="theme-color" content="#d4a574">
+  
+  <!-- Open Graph -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="BelaGuest | Agendamento para Salões de Beleza">
+  <meta property="og:description" content="Plataforma profissional de agendamento para salões de beleza.">
+  <meta property="og:locale" content="pt_BR">
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' fill='%23d4a574'>✨</text></svg>">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3H+mXVTKvlZbmnc6qtJ+XI3wKwkeuYa018TP5uj4/Ztwp7Z2UYRKC7nKapQEbqXsl9YYHS3Q3kcg==" crossorigin="anonymous" referrerpolicy="no-referrer">
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="/css/reset.css">
+  <link rel="stylesheet" href="/css/variables.css">
+  <link rel="stylesheet" href="/css/base.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/auth.css">
+  <link rel="stylesheet" href="/css/app.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+  
+  <title>BelaGuest | Agendamento para Salões de Beleza</title>
+</head>
+<body>
+  <!-- Background decorations -->
+  <div class="bg-pattern" aria-hidden="true"></div>
+  <div class="floating-shapes" aria-hidden="true">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
 
-    <main class="container">
-      <!-- Auth Section -->
-      <section id="authSection" class="auth-section">
-        <div class="auth-card">
-          <div class="auth-header">
-            <div class="logo">
-              <i class="fas fa-spa"></i>
-            </div>
-            <h1>BelaGuest</h1>
-            <p class="tagline">Sua beleza, nossa prioridade</p>
+  <main class="container">
+    <!-- Authentication Section -->
+    <section id="authSection" class="auth-section" role="main">
+      <article class="auth-card">
+        <header class="auth-header">
+          <div class="logo" aria-label="Logo BelaGuest">
+            <i class="fas fa-spa" aria-hidden="true"></i>
           </div>
-
-          <div class="auth-tabs" id="authTabs">
-            <button class="auth-tab active" data-auth-tab="login">
-              <i class="fas fa-sign-in-alt"></i> Entrar
-            </button>
-            <button class="auth-tab" data-auth-tab="register">
-              <i class="fas fa-user-plus"></i> Cadastrar
-            </button>
-          </div>
-
-          <form id="loginForm" class="auth-form">
-            <div class="input-group">
-              <i class="fas fa-envelope"></i>
-              <input type="email" name="email" placeholder="Seu e-mail" required />
-            </div>
-            <div class="input-group">
-              <i class="fas fa-lock"></i>
-              <input type="password" name="senha" placeholder="Sua senha" required />
-            </div>
-            <button type="submit" class="btn btn-primary btn-block">
-              <i class="fas fa-arrow-right"></i> Entrar
-            </button>
-          </form>
-
-          <form id="registerForm" class="auth-form hidden">
-            <div class="input-group">
-              <i class="fas fa-user"></i>
-              <input type="text" name="nome" placeholder="Seu nome completo" required />
-            </div>
-            <div class="input-group">
-              <i class="fas fa-envelope"></i>
-              <input type="email" name="email" placeholder="Seu e-mail" required />
-            </div>
-            <div class="input-group">
-              <i class="fas fa-lock"></i>
-              <input type="password" name="senha" placeholder="Crie uma senha" minlength="6" required />
-            </div>
-            <div class="input-group">
-              <i class="fas fa-phone"></i>
-              <input type="text" name="telefone" placeholder="Seu telefone" required />
-            </div>
-            <button type="submit" class="btn btn-primary btn-block">
-              <i class="fas fa-check"></i> Criar Conta
-            </button>
-          </form>
-
-          <div class="auth-footer">
-            <p><i class="fas fa-heart"></i> Bem-vinda ao seu espaço de beleza</p>
-          </div>
-        </div>
-      </section>
-
-      <!-- App Section -->
-      <section id="appSection" class="app-section hidden">
-        <header class="app-header">
-          <div class="header-brand">
-            <div class="brand-logo">
-              <i class="fas fa-spa"></i>
-            </div>
-            <div class="brand-info">
-              <h1>BelaGuest</h1>
-              <p id="welcomeSubtitle"></p>
-            </div>
-          </div>
-          <div class="header-user">
-            <div class="user-info">
-              <span id="welcomeTitle"></span>
-              <span id="realtimeBadge" class="realtime-badge">
-                <i class="fas fa-circle pulse"></i> Online
-              </span>
-            </div>
-            <button id="logoutBtn" class="btn btn-logout">
-              <i class="fas fa-sign-out-alt"></i> Sair
-            </button>
-          </div>
+          <h1>BelaGuest</h1>
+          <p class="tagline">Sua beleza, nossa prioridade</p>
         </header>
 
-        <div id="alert" class="alert hidden"></div>
+        <div class="auth-tabs" id="authTabs" role="tablist">
+          <button class="auth-tab active" data-auth-tab="login" role="tab" aria-selected="true" aria-controls="loginForm">
+            <i class="fas fa-sign-in-alt" aria-hidden="true"></i> Entrar
+          </button>
+          <button class="auth-tab" data-auth-tab="register" role="tab" aria-selected="false" aria-controls="registerForm">
+            <i class="fas fa-user-plus" aria-hidden="true"></i> Cadastrar
+          </button>
+        </div>
 
-        <nav class="main-nav">
-          <div id="roleTabs" class="nav-tabs"></div>
-        </nav>
+        <form id="loginForm" class="auth-form" role="tabpanel">
+          <fieldset>
+            <legend class="sr-only">Formulário de Login</legend>
+            
+            <div class="input-group">
+              <i class="fas fa-envelope" aria-hidden="true"></i>
+              <input 
+                type="email" 
+                name="email" 
+                placeholder="Seu e-mail" 
+                required
+                aria-label="E-mail"
+              >
+            </div>
+            
+            <div class="input-group">
+              <i class="fas fa-lock" aria-hidden="true"></i>
+              <input 
+                type="password" 
+                name="senha" 
+                placeholder="Sua senha" 
+                required
+                aria-label="Senha"
+              >
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">
+              <i class="fas fa-arrow-right" aria-hidden="true"></i> Entrar
+            </button>
+          </fieldset>
+        </form>
 
-        <section id="viewArea" class="view-area"></section>
+        <form id="registerForm" class="auth-form hidden" role="tabpanel">
+          <fieldset>
+            <legend class="sr-only">Formulário de Cadastro</legend>
+            
+            <div class="input-group">
+              <i class="fas fa-user" aria-hidden="true"></i>
+              <input 
+                type="text" 
+                name="nome" 
+                placeholder="Seu nome completo" 
+                required
+                aria-label="Nome completo"
+              >
+            </div>
+            
+            <div class="input-group">
+              <i class="fas fa-envelope" aria-hidden="true"></i>
+              <input 
+                type="email" 
+                name="email" 
+                placeholder="Seu e-mail" 
+                required
+                aria-label="E-mail"
+              >
+            </div>
+            
+            <div class="input-group">
+              <i class="fas fa-lock" aria-hidden="true"></i>
+              <input 
+                type="password" 
+                name="senha" 
+                placeholder="Crie uma senha" 
+                minlength="6" 
+                required
+                aria-label="Senha"
+              >
+            </div>
+            
+            <div class="input-group">
+              <i class="fas fa-phone" aria-hidden="true"></i>
+              <input 
+                type="tel" 
+                name="telefone" 
+                placeholder="Seu telefone" 
+                required
+                aria-label="Telefone"
+              >
+            </div>
+            
+            <button type="submit" class="btn btn-primary btn-block">
+              <i class="fas fa-check" aria-hidden="true"></i> Criar Conta
+            </button>
+          </fieldset>
+        </form>
 
-        <footer class="app-footer">
-          <p><i class="fas fa-heart"></i> BelaGuest - Transformando beleza em experiência</p>
+        <footer class="auth-footer">
+          <p>Bem-vinda ao seu espaço de beleza</p>
         </footer>
-      </section>
-    </main>
+      </article>
+    </section>
 
-    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js" crossorigin="anonymous"></script>
-    <script src="/app.js"></script>
-  </body>
+    <!-- Application Section -->
+    <section id="appSection" class="app-section hidden" role="main">
+      <header class="app-header">
+        <div class="header-brand">
+          <div class="brand-logo" aria-label="Logo BelaGuest">
+            <i class="fas fa-spa" aria-hidden="true"></i>
+          </div>
+          <div class="brand-info">
+            <h1>BelaGuest</h1>
+            <p id="welcomeSubtitle"></p>
+          </div>
+        </div>
+        
+        <div class="header-user">
+          <div class="user-info">
+            <span id="welcomeTitle"></span>
+            <span id="realtimeBadge" class="realtime-badge" aria-live="polite">
+              <i class="fas fa-circle pulse" aria-hidden="true"></i> Online
+            </span>
+          </div>
+          <button id="logoutBtn" class="btn btn-logout" aria-label="Fazer logout">
+            <i class="fas fa-sign-out-alt" aria-hidden="true"></i> Sair
+          </button>
+        </div>
+      </header>
+
+      <div id="alert" class="alert hidden" role="alert"></div>
+
+      <nav class="main-nav" role="navigation">
+        <div id="roleTabs" class="nav-tabs"></div>
+      </nav>
+
+      <section id="viewArea" class="view-area"></section>
+
+      <footer class="app-footer">
+        <p>BelaGuest - Transformando beleza em experiência</p>
+      </footer>
+    </section>
+  </main>
+
+  <!-- Scripts -->
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js" crossorigin="anonymous" defer></script>
+  <script src="/js/app.js" defer></script>
+</body>
 </html>

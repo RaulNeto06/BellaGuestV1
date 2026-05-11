@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BelaGuest – Funcionário</title>
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+  <header class="page-header">
+    <div class="logo">Bela<span>Guest</span></div>
+    <div class="user-info">
+      <strong id="header-nome">Carregando…</strong>
+      <span>Funcionário</span>
+    </div>
+    <button class="btn btn-ghost btn-sm" id="btn-logout" style="color:rgba(255,255,255,0.8)">Sair</button>
+  </header>
+
+  <div class="main-layout">
+    <aside class="sidebar">
+      <nav class="sidebar-nav">
+        <button class="sidebar-item active" data-section="hoje">
+          <span class="icon">📋</span> Agendamentos de Hoje
+        </button>
+        <button class="sidebar-item" data-section="calendario">
+          <span class="icon">📅</span> Meu Calendário
+        </button>
+        <button class="sidebar-item" data-section="perfil">
+          <span class="icon">👤</span> Meu Perfil
+        </button>
+      </nav>
+    </aside>
+
+    <main class="main-content">
+      <!-- Section: Agendamentos de Hoje -->
+      <section id="section-hoje" class="tab-content active">
+        <div class="section-header">
+          <div>
+            <div class="section-title" id="hoje-title">Agendamentos de Hoje</div>
+            <div class="section-subtitle" id="hoje-date"></div>
+          </div>
+          <div style="display:flex;gap:0.5rem;align-items:center">
+            <input type="date" id="nav-date" class="form-control" style="width:auto" />
+            <button class="btn btn-outline btn-sm" id="btn-nav-date">Ir</button>
+            <button class="btn btn-primary btn-sm" onclick="funcPage.loadAgendamentos()">🔄</button>
+          </div>
+        </div>
+        <div id="hoje-list">
+          <div class="loading-overlay"><div class="spinner"></div></div>
+        </div>
+      </section>
+
+      <!-- Section: Meu Calendário -->
+      <section id="section-calendario" class="tab-content">
+        <div class="section-header">
+          <div class="section-title">Minha Disponibilidade e Serviços</div>
+        </div>
+
+        <!-- Schedules -->
+        <div class="card mb-2">
+          <div class="card-header">
+            <h3>⏰ Horários de Trabalho</h3>
+            <button class="btn btn-primary btn-sm" id="btn-add-horario">+ Adicionar</button>
+          </div>
+          <div class="card-body">
+            <div id="horarios-list">
+              <div class="loading-overlay"><div class="spinner"></div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Services -->
+        <div class="card">
+          <div class="card-header">
+            <h3>💅 Meus Serviços</h3>
+          </div>
+          <div class="card-body">
+            <div id="func-servicos-list">
+              <div class="loading-overlay"><div class="spinner"></div></div>
+            </div>
+            <div class="mt-2">
+              <div class="form-group" style="margin:0">
+                <label class="form-label">Adicionar serviço</label>
+                <div style="display:flex;gap:0.5rem">
+                  <select id="func-add-servico" class="form-control form-select">
+                    <option value="">Selecione…</option>
+                  </select>
+                  <button class="btn btn-primary" id="btn-func-add-servico">Adicionar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section: Perfil -->
+      <section id="section-perfil" class="tab-content">
+        <div class="section-header">
+          <div class="section-title">Meu Perfil</div>
+        </div>
+        <div class="card" style="max-width:480px">
+          <div class="card-body">
+            <div class="form-group">
+              <label class="form-label">Nome</label>
+              <input type="text" id="perfil-nome" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Especialidade</label>
+              <input type="text" id="perfil-especialidade" class="form-control" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Telefone</label>
+              <input type="tel" id="perfil-telefone" class="form-control" />
+            </div>
+            <button class="btn btn-primary" id="btn-save-perfil">Salvar</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal: Horário -->
+  <div class="modal-overlay hidden" id="modal-horario">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="horario-modal-title">Adicionar Horário</h3>
+        <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-horario')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Dia da semana</label>
+          <select id="h-dia" class="form-control form-select">
+            <option value="0">Domingo</option>
+            <option value="1">Segunda-feira</option>
+            <option value="2">Terça-feira</option>
+            <option value="3">Quarta-feira</option>
+            <option value="4">Quinta-feira</option>
+            <option value="5">Sexta-feira</option>
+            <option value="6">Sábado</option>
+          </select>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+          <div class="form-group">
+            <label class="form-label">Início</label>
+            <input type="time" id="h-inicio" class="form-control" value="09:00" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Fim</label>
+            <input type="time" id="h-fim" class="form-control" value="18:00" />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-horario')">Cancelar</button>
+        <button class="btn btn-primary" id="btn-save-horario">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Notes -->
+  <div class="modal-overlay hidden" id="modal-obs">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Observação</h3>
+        <button class="btn btn-ghost btn-icon" onclick="closeModal('modal-obs')">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="obs-agenda-id" />
+        <div class="form-group">
+          <label class="form-label">Observação</label>
+          <textarea id="obs-text" class="form-control" rows="4"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" onclick="closeModal('modal-obs')">Cancelar</button>
+        <button class="btn btn-primary" id="btn-save-obs">Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="/js/api.js"></script>
+  <script src="/js/app.js"></script>
+  <script src="/js/funcionario.js"></script>
+</body>
+</html>
